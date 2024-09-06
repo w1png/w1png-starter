@@ -12,8 +12,8 @@ const main_font = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Gramobot - начни продавать за 10 минут!",
-  description: "Открой магазин в телеграм за 10 минут!",
+  title: "",
+  description: "",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
