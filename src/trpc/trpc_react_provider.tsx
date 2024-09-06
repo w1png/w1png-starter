@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { FileTRPCReactProvider } from "./file/react";
+import { MainTRPCReactProvider } from "./main/react";
 import { UserTRPCReactProvider } from "./user/react";
 
 export default function TRPCReactProvider({
@@ -9,7 +10,9 @@ export default function TRPCReactProvider({
 }) {
   return (
     <UserTRPCReactProvider>
-      <FileTRPCReactProvider>{children}</FileTRPCReactProvider>
+      <FileTRPCReactProvider>
+        <MainTRPCReactProvider>{children}</MainTRPCReactProvider>
+      </FileTRPCReactProvider>
     </UserTRPCReactProvider>
   );
 }
