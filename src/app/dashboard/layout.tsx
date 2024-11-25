@@ -1,17 +1,17 @@
 import { redirect } from "next/navigation";
 import type React from "react";
-import { getServerAuthSession } from "~/server/auth";
+import { auth } from "~/server/auth";
 
 export default async function DashboardLayout({
-  children,
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  const session = await getServerAuthSession();
+	const session = await auth();
 
-  if (!session?.user) {
-    redirect("/auth/signin");
-  }
+	if (!session?.user) {
+		redirect("/auth/signin");
+	}
 
-  return children;
+	return children;
 }
