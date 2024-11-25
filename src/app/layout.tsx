@@ -1,5 +1,6 @@
 import "~/styles/globals.css";
 
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Inter } from "next/font/google";
 import { type Metadata } from "next";
 
@@ -23,7 +24,9 @@ export default function RootLayout({
 	return (
 		<html lang="en" className={`${main_font.variable} font-main`}>
 			<body>
-				<TRPCReactProvider>{children}</TRPCReactProvider>
+				<NuqsAdapter>
+					<TRPCReactProvider>{children}</TRPCReactProvider>
+				</NuqsAdapter>
 			</body>
 		</html>
 	);
