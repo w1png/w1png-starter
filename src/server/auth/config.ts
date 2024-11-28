@@ -110,7 +110,6 @@ export const authConfig = {
 	}),
 	callbacks: {
 		session: async ({ session }) => {
-			console.log(session.user);
 			const database_user = await GetUser(session.user.email);
 
 			if (!database_user) {
