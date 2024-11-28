@@ -2,7 +2,7 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { fileRouter } from "./routers/file";
 
 export const appRouter = createTRPCRouter({
-	file: fileRouter,
+  file: fileRouter,
 });
 
 export type AppRouter = typeof appRouter;

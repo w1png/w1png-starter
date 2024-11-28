@@ -3,15 +3,15 @@ import type React from "react";
 import { auth } from "~/server/auth";
 
 export default async function DashboardLayout({
-	children,
+  children,
 }: {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-	const session = await auth();
+  const session = await auth();
 
-	if (!session?.user) {
-		redirect("/auth/signin");
-	}
+  if (!session?.user) {
+    redirect("/auth/signin");
+  }
 
-	return children;
+  return children;
 }

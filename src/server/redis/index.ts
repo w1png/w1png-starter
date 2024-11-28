@@ -2,7 +2,7 @@ import { createClient } from "redis";
 import { env } from "~/env";
 
 const globalForRedis = globalThis as unknown as {
-	url: string | undefined;
+  url: string | undefined;
 };
 
 const conn = globalForRedis.url ?? env.REDIS_URL;
