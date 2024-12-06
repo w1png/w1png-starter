@@ -30,8 +30,8 @@
   --color-popover-foreground: var(--color-foreground);
 
   --color-muted: var(--color-stone-200);
-  --color-muted-foreground: var(--color-stone-400) --color-destructive:
-    var(--color-red-400);
+  --color-muted-foreground: var(--color-stone-400);
+  --color-destructive: var(--color-red-400);
   --color-destructive-foreground: var(--color-white);
 
   --color-border: var(--color-gray-200);

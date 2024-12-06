@@ -7,7 +7,7 @@ import { s3 } from "~/server/s3";
 
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } },
+  context: { params: Promise<{ id: string }> },
 ) {
   const caller = createCaller(
     await createTRPCContext({
@@ -17,7 +17,7 @@ export async function GET(
 
   try {
     const file = await caller.file.get({
-      id: context.params.id,
+      id: (await context.params).id,
     });
 
     return new Response(
