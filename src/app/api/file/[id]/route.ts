@@ -7,7 +7,7 @@ import { s3 } from "~/server/s3";
 
 export async function GET(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> },
+  context: { params: { id: string } },
 ) {
   const caller = createCaller(
     await createTRPCContext({
@@ -17,22 +17,18 @@ export async function GET(
 
   try {
     const file = await caller.file.get({
-      id: (await context.params).id,
+      id: context.params.id,
     });
 
-    return new Response(
-      Buffer.from(
-        (await s3.get(file.objectId)).split(";base64,").pop()!,
-        "base64",
-      ),
-      {
-        headers: {
-          "Content-Type": file.contentType,
-          "Content-Disposition": `attachment; filename="${file.fileName}"`,
-          "Content-Encoding": "base64",
-        },
+    const stream = await s3.get(file.objectId);
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": file.contentType,
+        "Content-Disposition": `attachment; filename="${encodeURIComponent(file.fileName)}"`,
+        // "Content-Encoding": "base64",
       },
-    );
+    });
   } catch (cause) {
     console.error(cause);
     if (cause instanceof TRPCError) {

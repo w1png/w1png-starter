@@ -1,3 +1,4 @@
+import { getPlaiceholder } from "plaiceholder";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { FileSchema } from "~/lib/shared/types/file";
@@ -8,26 +9,58 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 import { files } from "~/server/db/schema";
+import sharp from "sharp";
+import { z } from "zod";
 
 export const fileRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(FileSchema)
+    .input(
+      FileSchema.merge(
+        z.object({
+          isImage: z.boolean().default(false),
+        }),
+      ),
+    )
     .mutation(async ({ ctx, input }) => {
-      const s3Key = await ctx.s3.upload(input);
+      try {
+        let buf = Buffer.from(
+          input.b64.split(";base64,")[1] ?? input.b64,
+          "base64",
+        );
+        if (input.isImage) {
+          buf = await sharp(buf).webp().toBuffer();
+        }
+        const { id } = (
+          await ctx.db
+            .insert(files)
+            .values({
+              ...input,
+              placeholder: input.isImage
+                ? (
+                    await getPlaiceholder(buf)
+                  ).base64
+                : "",
+              objectId: await ctx.s3.upload(
+                {
+                  ...input,
+                  contentType: input.isImage ? "image/webp" : input.contentType,
+                },
+                buf,
+              ),
+            })
+            .returning()
+        )[0]!;
 
-      const [file] = await ctx.db
-        .insert(files)
-        .values({
-          ...input,
-          id: undefined,
-          objectId: s3Key,
-          createdById: ctx.session.user.id,
-        })
-        .returning();
-
-      return {
-        id: file!.id,
-      };
+        return {
+          id,
+        };
+      } catch (e) {
+        console.error(e);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Ошибка загрузки файла",
+        });
+      }
     }),
   get: publicProcedure.input(IdSchema).query(async ({ ctx, input }) => {
     const file = await ctx.db.query.files.findFirst({
