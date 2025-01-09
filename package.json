@@ -4,16 +4,17 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "next dev --turbo",
     "build": "next build",
-    "check": "next lint && tsc --noEmit",
+    "start": "next start",
+
+    "auth:generate": "bunx @better-auth/cli generate --config ./src/server/auth/auth.ts --output ./src/server/db/auth-schema.ts",
+
+    "typecheck": "tsc --noEmit",
+
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
-    "dev": "next dev --turbo",
-    "preview": "next build && next start",
-    "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.2",
@@ -23,6 +24,8 @@
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
+    "@react-email/components": "^0.0.32",
+    "@react-email/render": "^1.0.4",
     "@t3-oss/env-nextjs": "^0.10.1",
     "@tanstack/react-query": "^5.50.0",
     "@tanstack/react-table": "^8.20.5",
@@ -32,6 +35,7 @@
     "@types/mime-types": "^2.1.4",
     "@types/nodemailer": "^6.4.17",
     "bcrypt": "^5.1.1",
+    "better-auth": "^1.1.10",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.33.0",
@@ -39,7 +43,6 @@
     "lucide-react": "^0.460.0",
     "mime-types": "^2.1.35",
     "next": "^15.0.1",
-    "next-auth": "5.0.0-beta.25",
     "next-themes": "^0.4.3",
     "nodemailer": "^6.9.16",
     "nuqs": "^2.2.3",
@@ -58,14 +61,13 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.0.0-beta.3",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^20.14.10",
     "@types/react": "npm:types-react@rc",
     "@types/react-dom": "npm:types-react-dom@rc",
     "drizzle-kit": "^0.24.0",
     "postcss": "^8.4.39",
-    "tailwindcss": "^4.0.0-beta.3",
+    "tailwindcss": "^3.4.3",
     "typescript": "^5.5.3"
   },
   "ct3aMetadata": {

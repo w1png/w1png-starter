@@ -1,70 +1,6 @@
-@import "tailwindcss";
-
-@plugin 'tailwindcss-animate';
-
-@variant dark (&:is(.dark *));
-
-@theme {
-  --font-sans: var(--font-main), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-
-  --radius: 0.5rem;
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
-
-  --color-background: var(--color-white);
-  --color-foreground: var(--color-black);
-
-  --color-primary: var(--color-stone-900);
-  --color-primary-foreground: var(--color-white);
-
-  --color-accent: var(--color-amber-500);
-  --color-accent-foreground: var(--color-white);
-
-  --color-secondary: var(--color-stone-200);
-  --color-secondary-foreground: var(--color-black);
-  --color-card: var(--color-secondary);
-  --color-card-foreground: var(--color-foreground);
-  --color-popover: var(--color-secondary);
-  --color-popover-foreground: var(--color-foreground);
-
-  --color-muted: var(--color-stone-200);
-  --color-muted-foreground: var(--color-stone-400);
-  --color-destructive: var(--color-red-400);
-  --color-destructive-foreground: var(--color-white);
-
-  --color-border: var(--color-gray-200);
-  --color-input: var(--color-gray-200);
-  --color-ring: hsl(20 14.3% 4.1%);
-
-  --color-chart-1: hsl(12 76% 61%);
-  --color-chart-2: hsl(173 58% 39%);
-  --color-chart-3: hsl(197 37% 24%);
-  --color-chart-4: hsl(43 74% 66%);
-  --color-chart-5: hsl(27 87% 67%);
-}
-
-@utility container {
-  margin-inline: auto;
-  padding-inline: 2rem;
-  @media (width >= theme(--breakpoint-sm)) {
-    max-width: none;
-  }
-  @media (width >= 1400px) {
-    max-width: 1400px;
-  }
-}
-
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   * {
@@ -84,5 +20,13 @@
     input {
       font-size: 16px !important;
     }
+  }
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
   }
 }

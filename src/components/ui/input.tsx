@@ -1,6 +1,8 @@
 import * as React from "react";
 
 import { cn } from "~/lib/client/utils";
+import { Button } from "./button";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
@@ -19,4 +21,37 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
 );
 Input.displayName = "Input";
 
-export { Input };
+const PasswordInput = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, ...props }, ref) => {
+    const [visible, setVisible] = React.useState(false);
+
+    return (
+      <div className="h-fit relative flex">
+        <Input
+          autoComplete="current-password"
+          type={visible ? "text" : "password"}
+          className="pr-12"
+          ref={ref}
+          {...props}
+        />
+        <Button
+          tabIndex={-1}
+          size="icon"
+          type="button"
+          variant="transparent"
+          onClick={() => setVisible(!visible)}
+          className="absolute h-12 right-0 inset-y-0 text-muted-foreground"
+        >
+          {visible ? (
+            <EyeOffIcon className="size-8" />
+          ) : (
+            <EyeIcon className="size-8" />
+          )}
+        </Button>
+      </div>
+    );
+  },
+);
+PasswordInput.displayName = "PasswordInput";
+
+export { Input, PasswordInput };

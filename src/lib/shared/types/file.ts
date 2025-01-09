@@ -25,3 +25,5 @@ export const FileSchema = z.object({
     })
     .min(1, "Необходимо указать base64 строку"),
 });
+
+export type ProcessedFile = z.infer<typeof FileSchema>;

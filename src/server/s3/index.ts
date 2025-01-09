@@ -1,4 +1,4 @@
-import { encode } from "punycode";
+import { encode } from "node:punycode";
 import {
   DeleteObjectCommand,
   GetObjectCommand,
@@ -6,9 +6,8 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import type { z } from "zod";
 import { env } from "~/env";
-import type { FileSchema } from "~/lib/shared/types/file";
+import type { ProcessedFile } from "~/lib/shared/types/file";
 
 class S3Storage {
   private readonly s3Client: S3Client;
@@ -24,14 +23,13 @@ class S3Storage {
     });
   }
 
-  async upload(file: z.infer<typeof FileSchema>): Promise<string> {
+  async upload(file: ProcessedFile, buffer: Buffer): Promise<string> {
     const key = crypto.randomUUID();
-
     await this.s3Client.send(
       new PutObjectCommand({
         Bucket: env.S3_BUCKET,
         Key: key,
-        Body: file.b64,
+        Body: buffer,
         ContentEncoding: "base64",
         ContentType: file.contentType,
         Metadata: {
@@ -39,11 +37,10 @@ class S3Storage {
         },
       }),
     );
-
     return key;
   }
 
-  async get(key: string): Promise<string> {
+  async get(key: string): Promise<ReadableStream> {
     const command = new GetObjectCommand({
       Bucket: env.S3_BUCKET,
       Key: key,
@@ -51,7 +48,7 @@ class S3Storage {
 
     const response = await this.s3Client.send(command);
     if (!response.Body) throw Error("S3 response body is undefined");
-    return response.Body.transformToString();
+    return response.Body.transformToWebStream();
   }
 
   async getSignedUrl(key: string): Promise<string> {

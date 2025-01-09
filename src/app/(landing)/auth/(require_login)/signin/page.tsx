@@ -1,14 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "~/components/ui/form";
-import { Input } from "~/components/ui/input";
+import { Input, PasswordInput } from "~/components/ui/input";
+import { authClient } from "~/lib/client/auth-client";
 import { OnError } from "~/lib/client/on_error";
 
 export default function SignInPage() {
@@ -20,6 +20,11 @@ export default function SignInPage() {
       .email({
         message: "Неверный формат Email",
       }),
+    password: z
+      .string({
+        message: "Пароль обязателен для ввода",
+      })
+      .min(1, "Введите пароль"),
   });
 
   const router = useRouter();
@@ -29,26 +34,16 @@ export default function SignInPage() {
     defaultValues: {} as z.infer<typeof loginSchema>,
   });
 
-  async function OnSubmit<P extends "email" | "google" | "github" | "yandex">({
-    provider,
-    data,
-  }: {
-    provider: P;
-    data: P extends "email" ? z.infer<typeof loginSchema> : undefined;
-  }) {
-    try {
-      const res = await signIn(provider, {
-        redirect: false,
-        ...data,
-      });
-      if (res?.error) {
-        throw new Error(res.error);
-      }
-
-      router.push("/");
-    } catch (error) {
-      toast.error((error as Error).message);
-    }
+  async function OnSubmit(data: z.infer<typeof loginSchema>) {
+    await authClient.signIn.email(data, {
+      onSuccess() {
+        router.push("/");
+      },
+      onError(error) {
+        console.error(error);
+        toast.error("Не удалось войти в аккаунт");
+      },
+    });
   }
 
   return (
@@ -58,7 +53,7 @@ export default function SignInPage() {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit((data) => {
-              OnSubmit({ provider: "email", data });
+              OnSubmit(data);
             }, OnError)}
             className="space-y-2"
           >
@@ -68,42 +63,27 @@ export default function SignInPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input
-                      placeholder="Email"
-                      {...field}
-                    />
+                    <Input placeholder="Email" {...field} />
                   </FormControl>
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              className="w-full"
-            >
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <PasswordInput placeholder="Пароль" {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full">
               Войти
             </Button>
           </form>
         </Form>
-        <div className="space-y-2 flex flex-col">
-          <Button
-            className="min-w-[300px]"
-            onClick={() => OnSubmit({ provider: "google", data: undefined })}
-          >
-            Войти через Google
-          </Button>
-          <Button
-            className="min-w-[300px]"
-            onClick={() => OnSubmit({ provider: "github", data: undefined })}
-          >
-            Войти через Github
-          </Button>
-          <Button
-            className="min-w-[300px]"
-            onClick={() => OnSubmit({ provider: "yandex", data: undefined })}
-          >
-            Войти через Yandex
-          </Button>
-        </div>
       </div>
     </div>
   );

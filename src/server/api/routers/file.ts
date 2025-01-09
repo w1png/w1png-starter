@@ -23,7 +23,7 @@ export const fileRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        let buf = Buffer.from(
+        let buf: Buffer = Buffer.from(
           input.b64.split(";base64,")[1] ?? input.b64,
           "base64",
         );
