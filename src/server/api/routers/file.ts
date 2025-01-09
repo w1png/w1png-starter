@@ -1,16 +1,11 @@
-import { getPlaiceholder } from "plaiceholder";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
-import { FileSchema } from "~/lib/shared/types/file";
-import { IdSchema } from "~/lib/shared/types/utils";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
-import { files } from "~/server/db/schema";
+import mime from "mime-types";
+import { getPlaiceholder } from "plaiceholder";
 import sharp from "sharp";
 import { z } from "zod";
+import { FileSchema } from "~/lib/shared/types/file";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { files } from "~/server/db/schema";
 
 export const fileRouter = createTRPCRouter({
   create: protectedProcedure
@@ -30,29 +25,27 @@ export const fileRouter = createTRPCRouter({
         if (input.isImage) {
           buf = await sharp(buf).webp().toBuffer();
         }
-        const { id } = (
-          await ctx.db
-            .insert(files)
-            .values({
-              ...input,
-              placeholder: input.isImage
-                ? (
-                    await getPlaiceholder(buf)
-                  ).base64
-                : "",
-              objectId: await ctx.s3.upload(
-                {
-                  ...input,
-                  contentType: input.isImage ? "image/webp" : input.contentType,
-                },
-                buf,
-              ),
-            })
-            .returning()
-        )[0]!;
+        const placeholder = input.isImage
+          ? (await getPlaiceholder(buf)).base64
+          : undefined;
+        const objectId = crypto.randomUUID();
+        const mimeType = mime.extension(input.fileName);
+        const metadata = ctx.s3.file(objectId);
+        await metadata.write(buf, {
+          type: mimeType ? mimeType : "application/octet-stream",
+        });
+
+        const [file] = await ctx.db
+          .insert(files)
+          .values({
+            ...input,
+            placeholder,
+            objectId,
+          })
+          .returning();
 
         return {
-          id,
+          id: file!.id,
         };
       } catch (e) {
         console.error(e);
@@ -62,26 +55,4 @@ export const fileRouter = createTRPCRouter({
         });
       }
     }),
-  get: publicProcedure.input(IdSchema).query(async ({ ctx, input }) => {
-    const file = await ctx.db.query.files.findFirst({
-      where: eq(files.id, input.id),
-    });
-
-    if (!file) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Файл не найден",
-      });
-    }
-
-    const presignedUrl = await ctx.s3.getSignedUrl(file.objectId);
-
-    return {
-      presignedUrl,
-      objectId: file.objectId,
-      contentType: file.contentType,
-      fileName: file.fileName,
-      fileSize: file.fileSize,
-    };
-  }),
 });
