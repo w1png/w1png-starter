@@ -7,11 +7,25 @@ import VerificationEmail from "../email/verificationEmail";
 import { env } from "~/env";
 import type { UserRole } from "~/lib/shared/types/user";
 import SignUpEmail from "../email/signUpEmail";
+import { redis } from "../redis";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
+  secondaryStorage: {
+    get: async (key) => {
+      const value = await redis.get(key);
+      return value ? value : null;
+    },
+    set: async (key, value, ttl) => {
+      if (ttl) await redis.set(key, value, { EX: ttl });
+      else await redis.set(key, value);
+    },
+    delete: async (key) => {
+      await redis.del(key);
+    },
+  },
   user: {
     additionalFields: {
       role: {

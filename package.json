@@ -7,17 +7,14 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-
     "auth:generate": "bunx @better-auth/cli generate --config ./src/server/auth/auth.ts --output ./src/server/db/auth-schema.ts",
-
+    "email": "email dev --dir src/server/email",
     "typecheck": "tsc --noEmit",
-
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
-    "@auth/drizzle-adapter": "^1.7.2",
     "@aws-sdk/client-s3": "^3.699.0",
     "@aws-sdk/s3-request-presigner": "^3.699.0",
     "@hookform/resolvers": "^3.9.1",
@@ -67,6 +64,7 @@
     "@types/react-dom": "npm:types-react-dom@rc",
     "drizzle-kit": "^0.24.0",
     "postcss": "^8.4.39",
+    "react-email": "^3.0.5",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.5.3"
   },
