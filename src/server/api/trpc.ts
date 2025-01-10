@@ -67,7 +67,7 @@ export const protectedProcedure = publicProcedure.use(({ ctx, next }) => {
 });
 
 export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (ctx.session.user.role !== "ADMIN") {
+  if (ctx.session.user.role !== "admin") {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({ ctx });

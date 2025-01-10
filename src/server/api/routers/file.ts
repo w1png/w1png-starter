@@ -8,6 +8,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { files } from "~/server/db/schema";
 
 export const fileRouter = createTRPCRouter({
+  test: protectedProcedure.query(() => console.log("test")),
   create: protectedProcedure
     .input(
       FileSchema.merge(

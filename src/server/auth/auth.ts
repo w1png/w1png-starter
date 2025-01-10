@@ -5,9 +5,10 @@ import { email } from "../email";
 import ResetPasswordEmail from "../email/resetPasswordEmail";
 import VerificationEmail from "../email/verificationEmail";
 import { env } from "~/env";
-import type { UserRole } from "~/lib/shared/types/user";
 import SignUpEmail from "../email/signUpEmail";
 import { redis } from "../redis";
+import { admin } from "better-auth/plugins";
+import type { UserRole } from "~/lib/shared/types/user";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -28,12 +29,12 @@ export const auth = betterAuth({
   },
   user: {
     additionalFields: {
-      role: {
-        type: "string",
-        required: true,
-        defaultValue: "USER" as UserRole,
-        input: false,
-      },
+      // role: {
+      //   type: "string",
+      //   required: true,
+      //   defaultValue: "USER" as UserRole,
+      //   input: false,
+      // },
     },
   },
   databaseHooks: {
@@ -45,8 +46,8 @@ export const auth = betterAuth({
               data: {
                 ...user,
                 role: (user.email === env.MAIN_ADMIN_EMAIL
-                  ? "ADMIN"
-                  : "USER") as UserRole,
+                  ? "admin"
+                  : "user") as UserRole,
               },
             }),
           ),
@@ -69,7 +70,7 @@ export const auth = betterAuth({
         body: ResetPasswordEmail({ url }),
       });
     },
-    requireEmailVerification: true,
+    requireEmailVerification: env.NODE_ENV !== "test",
   },
   emailVerification: {
     autoSignInAfterVerification: true,
@@ -84,4 +85,7 @@ export const auth = betterAuth({
       });
     },
   },
+  plugins: [admin()],
 });
+
+export type Session = Awaited<ReturnType<(typeof auth)["api"]["getSession"]>>;

@@ -4,7 +4,11 @@ import { cn } from "~/lib/client/utils";
 import { Button } from "./button";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
+export interface InputProps extends React.ComponentProps<"input"> {
+  className?: string;
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => {
     return (
       <input
