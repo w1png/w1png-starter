@@ -1,4 +1,5 @@
 stages:
+  - typecheck
   - test
   - build
   - deploy
@@ -9,6 +10,14 @@ variables:
   IMAGE: $REGISTRY/$CI_PROJECT_PATH
   DOCKER_HOST: "tcp://localhost:2375"
   DOCKER_TLS_CERTDIR: ""
+
+typecheck:
+  stage: typecheck
+  image: oven/bun:latest
+  allow_failure: true
+  script:
+    - bun install
+    - bun run typecheck
 
 test:
   stage: test
