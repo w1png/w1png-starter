@@ -1,12 +1,12 @@
 import {
   boolean,
   integer,
-  pgEnum,
   pgTableCreator,
   text,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import type { UserRole } from "~/lib/shared/types/user";
 
 export const createTable = pgTableCreator((name) => `project_${name}`);
 
@@ -23,21 +23,18 @@ export const files = createTable("files", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const userRoleEnum = pgEnum("user_role", ["ADMIN", "USER"]);
-
 export const user = createTable("user", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
+  id: text("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull(),
   image: text("image"),
-
-  role: userRoleEnum("role").notNull(),
-
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
+  role: text("role").$type<UserRole>(),
+  banned: boolean("banned"),
+  banReason: text("ban_reason"),
+  banExpires: timestamp("ban_expires"),
 });
 
 export const session = createTable("session", {
@@ -51,6 +48,7 @@ export const session = createTable("session", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id),
+  impersonatedBy: text("impersonated_by"),
 });
 
 export const account = createTable("account", {
