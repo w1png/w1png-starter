@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: REPLACE_ME
+  namespace: REPLACE_ME
+spec:
+  ingressClassName: cloudflare-tunnel
+  rules:
+    - host: REPLACE_ME.w1png.ru
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: REPLACE_ME
+                port:
+                  number: 3000
