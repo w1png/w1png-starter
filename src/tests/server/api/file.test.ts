@@ -12,7 +12,7 @@ const testFile: ProcessedFile = {
   ),
 };
 
-test("create", async () => {
+test("file.create", async () => {
   const { user } = await CreateUser();
 
   const caller = setupCaller({
@@ -30,7 +30,7 @@ test("create", async () => {
   expect(id).toBeTruthy();
 });
 
-test("create-max-file-size", async () => {
+test("file.create-max-file-size", async () => {
   const testHugeFile: ProcessedFile = {
     fileName: "test.png",
     contentType: "image/png",
@@ -60,7 +60,7 @@ test("create-max-file-size", async () => {
   }).toThrow();
 });
 
-test("create-unauthorized", () => {
+test("file.create-unauthorized", () => {
   const caller = setupCaller({ headers: new Headers(), session: null });
   expect(async () => {
     await caller.file.create(testFile);

@@ -1,5 +1,4 @@
 stages:
-  - typecheck
   - test
   - build
   - deploy
@@ -12,7 +11,7 @@ variables:
   DOCKER_TLS_CERTDIR: ""
 
 typecheck:
-  stage: typecheck
+  stage: test
   image: oven/bun:latest
   allow_failure: true
   script:
