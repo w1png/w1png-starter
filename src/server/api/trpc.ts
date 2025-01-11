@@ -6,6 +6,8 @@ import { db } from "~/server/db";
 import { redis } from "../redis";
 import { s3 } from "../s3";
 import { auth } from "../auth/auth";
+import { logger } from "~/lib/server/logger";
+import { env } from "~/env";
 
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const session = await auth.api.getSession({ headers: opts.headers });
@@ -37,23 +39,43 @@ export const createCallerFactory = t.createCallerFactory;
 
 export const createTRPCRouter = t.router;
 
-const timingMiddleware = t.middleware(async ({ next, path }) => {
+const loggingMiddleware = t.middleware(async ({ next, path }) => {
   const start = Date.now();
+  try {
+    const result = await next();
+    const end = Date.now();
+    const duration_ms = end - start;
+    logger.info({ path, start, end, duration_ms });
+    return result;
+  } catch (error) {
+    const end = Date.now();
+    const duration = end - start;
+    logger.error({
+      path,
+      start,
+      end,
+      duration,
+      error: (error as Error | TRPCError).message,
+    });
+    if (env.NODE_ENV === "development") {
+      throw error;
+    }
 
-  if (t._config.isDev) {
-    const waitMs = Math.floor(Math.random() * 400) + 100;
-    await new Promise((resolve) => setTimeout(resolve, waitMs));
+    if (
+      error instanceof TRPCError ||
+      (env.NODE_ENV as "production" | "test" | "development") === "development"
+    ) {
+      throw error;
+    }
+
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Неизвестная ошибка сервера",
+    });
   }
-
-  const result = await next();
-
-  const end = Date.now();
-  console.log(`[TRPC] ${path} took ${end - start}ms to execute`);
-
-  return result;
 });
 
-export const publicProcedure = t.procedure.use(timingMiddleware);
+export const publicProcedure = t.procedure.use(loggingMiddleware);
 
 export const protectedProcedure = publicProcedure.use(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {

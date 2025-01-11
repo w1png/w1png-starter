@@ -68,8 +68,8 @@ export default function SignUpPage() {
       onError(error) {
         setLoading(false);
         toast.error("Не удалось войти в аккаунт", {
-          description:
-            authErrorCodes[error.error.message]?.ru ?? "Неизвестная ошибка",
+          description: "Неизвестная ошибка",
+          /*authErrorCodes[error.error.message]?.ru ??*/
         });
       },
       onRequest() {

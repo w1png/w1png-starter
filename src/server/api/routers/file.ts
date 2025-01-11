@@ -3,12 +3,12 @@ import mime from "mime-types";
 import { getPlaiceholder } from "plaiceholder";
 import sharp from "sharp";
 import { z } from "zod";
+import { logger } from "~/lib/server/logger";
 import { FileSchema } from "~/lib/shared/types/file";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { files } from "~/server/db/schema";
 
 export const fileRouter = createTRPCRouter({
-  test: protectedProcedure.query(() => console.log("test")),
   create: protectedProcedure
     .input(
       FileSchema.merge(
@@ -49,7 +49,7 @@ export const fileRouter = createTRPCRouter({
           id: file!.id,
         };
       } catch (e) {
-        console.error(e);
+        logger.error(e);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Ошибка загрузки файла",

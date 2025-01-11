@@ -11,7 +11,6 @@ export default async function RequireLoginRedirect({
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-  console.log(session);
 
   if (session) redirect("/");
 

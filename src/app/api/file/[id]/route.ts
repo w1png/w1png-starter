@@ -2,12 +2,13 @@ import { TRPCError } from "@trpc/server";
 import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
+import { logger } from "~/lib/server/logger";
 import { db } from "~/server/db";
 import { files } from "~/server/db/schema";
 import { s3 } from "~/server/s3";
 
 export async function GET(
-  _: NextRequest,
+  r: NextRequest,
   context: { params: Promise<{ id: string }> },
 ) {
   const { id } = await context.params;
@@ -30,7 +31,7 @@ export async function GET(
       },
     });
   } catch (cause) {
-    console.error(cause);
+    logger.error({ error: cause, id, url: r.url });
     if (cause instanceof TRPCError) {
       const httpCode = getHTTPStatusCodeFromError(cause);
       return new Response(cause.message, {

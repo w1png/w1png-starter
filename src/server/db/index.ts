@@ -3,17 +3,29 @@ import postgres from "postgres";
 
 import { env } from "~/env";
 import * as schema from "./schema";
+import { logger } from "~/lib/server/logger";
+import { DefaultLogger, type LogWriter } from "drizzle-orm";
 
-/**
- * Cache the database connection in development. This avoids creating a new connection on every HMR
- * update.
- */
 const globalForDb = globalThis as unknown as {
   conn: postgres.Sql | undefined;
 };
 
 const conn =
-  globalForDb.conn ?? postgres(env.DATABASE_URL, { onnotice: () => {} });
+  globalForDb.conn ??
+  postgres(env.DATABASE_URL, {
+    onnotice: (n) => {
+      logger.warn(n);
+    },
+  });
 if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 
-export const db = drizzle(conn, { schema });
+class WinstonLogger implements LogWriter {
+  write(message: string) {
+    logger.info(message);
+  }
+}
+
+export const db = drizzle(conn, {
+  schema,
+  logger: new DefaultLogger({ writer: new WinstonLogger() }),
+});
