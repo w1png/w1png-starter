@@ -7,7 +7,7 @@
     "dev": "bun run --bun next dev",
     "build": "next build",
     "start": "next start",
-    "test": "bun test --reporter=junit --reporter-outfile=./bun.xml --env-file=.env.test --preload ./src/tests/setup.ts",
+    "test": "bun test --reporter=junit --reporter-outfile=./bun.xml --preload ./src/tests/setup.ts",
     "auth:generate": "bunx @better-auth/cli generate --config ./src/server/auth/auth.ts --output ./src/server/db/auth-schema.ts",
     "email": "email dev --dir src/server/email",
     "typecheck": "tsc --noEmit",
@@ -53,7 +53,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.2.15",
+    "@testcontainers/postgresql": "^10.16.0",
     "@types/bun": "^1.1.16",
     "@types/mime-types": "^2.1.4",
     "@types/nodemailer": "^6.4.17",
