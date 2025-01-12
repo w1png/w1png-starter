@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --nav-height: 4rem;
+}
+
 @layer base {
   * {
     @apply border-border;

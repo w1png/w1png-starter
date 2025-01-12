@@ -17,8 +17,13 @@ export default {
         sans: ["var(--font-main)", ...fontFamily.sans],
       },
       spacing: {
-        navbar: "4rem",
-        "mobile-boundary": "30rem",
+        navbar: "var(--nav-height)",
+      },
+      height: {
+        "screen-navbar": "calc(100svh - var(--nav-height))",
+      },
+      minHeight: {
+        "screen-navbar": "calc(100svh - var(--nav-height))",
       },
       borderRadius: {
         lg: "var(--radius)",
