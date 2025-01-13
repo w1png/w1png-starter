@@ -13,7 +13,7 @@ export const files = createTable("files", {
   id: varchar("id", { length: 255 })
     .notNull()
     .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
+    .$defaultFn(() => Bun.randomUUIDv7()),
   fileName: varchar("file_name", { length: 255 }).notNull(),
   fileSize: integer("file_size").notNull(),
   placeholder: text("placeholder"),

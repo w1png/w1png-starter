@@ -1,4 +1,4 @@
-import { test, expect } from "bun:test";
+import { test, expect, describe } from "bun:test";
 import { api } from "~/server/api";
 import { CreateUser } from "~/tests/create-user";
 import { FileFromBuffer } from "~/tests/utils";
@@ -19,93 +19,95 @@ const testImage = FileFromBuffer(
   "test.jpg",
 );
 
-test("file.get.notFound", async () => {
-  const file = await api.api.file({ id: "123" }).get();
-  expect(file.error?.status).toBe(404);
-});
+describe("file", () => {
+  test("get.notFound", async () => {
+    const file = await api.api.file({ id: "123" }).get();
+    expect(file.error?.status).toBe(404);
+  });
 
-test("file.create.notImage", async () => {
-  const { headers } = await CreateUser();
+  test("create.notImage", async () => {
+    const { headers } = await CreateUser();
 
-  const file = await api.api.file.index.post(
-    { file: testFile },
-    { headers, query: { isImage: false } },
-  );
-  expect(file.error).toBeFalsy();
-  expect(file.data).toBeTruthy();
-});
+    const file = await api.api.file.index.post(
+      { file: testFile },
+      { headers, query: { isImage: false } },
+    );
+    expect(file.error).toBeFalsy();
+    expect(file.data).toBeTruthy();
+  });
 
-test("file.get.unauthorized", async () => {
-  const { headers } = await CreateUser();
+  test("get.unauthorized", async () => {
+    const { headers } = await CreateUser();
 
-  const uploadedFile = await api.api.file.index.post(
-    { file: testFile },
-    { headers, query: { isImage: false } },
-  );
-  expect(uploadedFile.data).toBeTruthy();
+    const uploadedFile = await api.api.file.index.post(
+      { file: testFile },
+      { headers, query: { isImage: false } },
+    );
+    expect(uploadedFile.data).toBeTruthy();
 
-  const file = await api.api.file({ id: uploadedFile.data!.id }).get();
-  expect(file.response.headers.get("Content-Type")).toBe(
-    "application/octet-stream, text/event-stream; charset=utf-8",
-  );
-  expect(file.response.headers.get("Content-Disposition")).toBe(
-    `attachment; filename="test.txt"`,
-  );
-  expect(file.error).toBeFalsy();
-  expect(file.data).toBeTruthy();
-});
+    const file = await api.api.file({ id: uploadedFile.data!.id }).get();
+    expect(file.response.headers.get("Content-Type")).toBe(
+      "application/octet-stream, text/event-stream; charset=utf-8",
+    );
+    expect(file.response.headers.get("Content-Disposition")).toBe(
+      `attachment; filename="test.txt"`,
+    );
+    expect(file.error).toBeFalsy();
+    expect(file.data).toBeTruthy();
+  });
 
-test("file.get.autorized", async () => {
-  const { headers } = await CreateUser();
+  test("get.autorized", async () => {
+    const { headers } = await CreateUser();
 
-  const uploadedFile = await api.api.file.index.post(
-    { file: testFile },
-    { headers, query: { isImage: false } },
-  );
-  expect(uploadedFile.data).toBeTruthy();
+    const uploadedFile = await api.api.file.index.post(
+      { file: testFile },
+      { headers, query: { isImage: false } },
+    );
+    expect(uploadedFile.data).toBeTruthy();
 
-  const file = await api.api
-    .file({ id: uploadedFile.data!.id })
-    .get({ headers });
-  expect(file.response.headers.get("Content-Type")).toBe(
-    "application/octet-stream, text/event-stream; charset=utf-8",
-  );
-  expect(file.response.headers.get("Content-Disposition")).toBe(
-    `attachment; filename="test.txt"`,
-  );
-  expect(file.error).toBeFalsy();
-  expect(file.data).toBeTruthy();
-});
+    const file = await api.api
+      .file({ id: uploadedFile.data!.id })
+      .get({ headers });
+    expect(file.response.headers.get("Content-Type")).toBe(
+      "application/octet-stream, text/event-stream; charset=utf-8",
+    );
+    expect(file.response.headers.get("Content-Disposition")).toBe(
+      `attachment; filename="test.txt"`,
+    );
+    expect(file.error).toBeFalsy();
+    expect(file.data).toBeTruthy();
+  });
 
-test("file.create.image", async () => {
-  const { headers } = await CreateUser();
+  test("create.image", async () => {
+    const { headers } = await CreateUser();
 
-  const file = await api.api.file.index.post(
-    { file: testImage },
-    { headers, query: { isImage: true } },
-  );
-  expect(file.error).toBeFalsy();
-  expect(file.data).toBeTruthy();
-});
+    const file = await api.api.file.index.post(
+      { file: testImage },
+      { headers, query: { isImage: true } },
+    );
+    expect(file.error).toBeFalsy();
+    expect(file.data).toBeTruthy();
+  });
 
-test("file.create.image.invalid", async () => {
-  const { headers } = await CreateUser();
+  test("create.image.invalid", async () => {
+    const { headers } = await CreateUser();
 
-  const res = await api.api.file.index.post(
-    { file: testFile },
-    { headers, query: { isImage: true } },
-  );
-  expect(res.error).toBeTruthy();
-  expect(res.data).toBeFalsy();
-});
+    const res = await api.api.file.index.post(
+      { file: testFile },
+      { headers, query: { isImage: true } },
+    );
+    expect(res.error).toBeTruthy();
+    expect(res.data).toBeFalsy();
+  });
 
-test("file.create.image.tooBig", async () => {
-  const { headers } = await CreateUser();
+  test("create.image.tooBig", async () => {
+    const { headers } = await CreateUser();
 
-  const res = await api.api.file.index.post(
-    { file: testBigFile },
-    { headers, query: { isImage: true } },
-  );
-  expect(res.error).toBeTruthy();
-  expect(res.data).toBeFalsy();
+    const res = await api.api.file.index.post(
+      { file: testBigFile },
+      { headers, query: { isImage: true } },
+    );
+    expect(res.error).toBeTruthy();
+    expect(res.data).toBeFalsy();
+  });
 });

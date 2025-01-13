@@ -1,11 +1,10 @@
-import { mock, beforeEach } from "bun:test";
+import { mock, beforeEach, spyOn } from "bun:test";
 import { drizzle } from "drizzle-orm/pglite";
 import * as schema from "~/server/db/schema";
 import { PGlite } from "@electric-sql/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { sql } from "drizzle-orm";
-import { treaty } from "@elysiajs/eden";
-import { app } from "~/server/api";
+import { logger } from "~/server/logger";
 
 const db = drizzle(new PGlite(), { schema });
 
@@ -19,7 +18,7 @@ mock.module("redis", () => {
         const value = store.get(key);
         return new Promise((resolve) => resolve(value));
       },
-      set: async (key: string, value: string, ttl: unknown) => {
+      set: async (key: string, value: string, _: unknown) => {
         return new Promise((resolve) => {
           store.set(key, value);
           resolve(true);
@@ -44,6 +43,10 @@ mock.module("~/server/email", () => {
     },
   };
 });
+
+// @ts-ignore
+// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
+spyOn(logger, "info").mockImplementation(() => {});
 
 mock.module("../server/db", async () => {
   await migrate(db, {
