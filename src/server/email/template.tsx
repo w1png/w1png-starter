@@ -3,10 +3,8 @@ import {
   Container,
   Font,
   Head,
-  Hr,
   Html,
   Tailwind,
-  Text,
 } from "@react-email/components";
 import type { ReactNode } from "react";
 

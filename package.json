@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --bun next dev",
-    "build": "next build",
+    "build": "bunx --bun next build",
     "start": "next start",
     "test": "bun test --reporter=junit --reporter-outfile=./bun.xml --preload ./src/tests/setup.ts",
     "auth:generate": "bunx @better-auth/cli generate --config ./src/server/auth/auth.ts --output ./src/server/db/auth-schema.ts",

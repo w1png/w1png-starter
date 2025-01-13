@@ -1,8 +1,8 @@
 stages:
   - test
   - build
-  - deploy
-  - migrate
+  # - deploy
+  # - migrate
 
 variables:
   REGISTRY: registry.w1png.ru
