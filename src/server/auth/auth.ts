@@ -9,6 +9,7 @@ import SignUpEmail from "../email/signUpEmail";
 import { redis } from "../redis";
 import { admin } from "better-auth/plugins";
 import type { UserRole } from "~/lib/shared/types/user";
+import { logger } from "../logger";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -52,6 +53,7 @@ export const auth = betterAuth({
             }),
           ),
         after: async (user) => {
+          logger.info({ message: "Sending SignUp Email", user });
           await email.send({
             to: user.email,
             subject: "Спасибо за регистрацию",
@@ -64,6 +66,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
+      logger.info({ message: "Sending reset Email", user, url });
       await email.send({
         to: user.email,
         subject: "Восстановление пароля",
@@ -76,6 +79,7 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
+      logger.info({ message: "Sending verification Email", user, url });
       await email.send({
         to: user.email,
         subject: "Подтвердите ваш адрес электронной почты",

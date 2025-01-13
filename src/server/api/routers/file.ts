@@ -1,59 +1,89 @@
-import { TRPCError } from "@trpc/server";
+import { eq } from "drizzle-orm";
+import Elysia, { error, t } from "elysia";
 import mime from "mime-types";
 import { getPlaiceholder } from "plaiceholder";
 import sharp from "sharp";
-import { z } from "zod";
-import { logger } from "~/lib/server/logger";
-import { FileSchema } from "~/lib/shared/types/file";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { db } from "~/server/db";
 import { files } from "~/server/db/schema";
+import { s3 } from "~/server/s3";
+import { userService } from "./user";
 
-export const fileRouter = createTRPCRouter({
-  create: protectedProcedure
-    .input(
-      FileSchema.merge(
-        z.object({
-          isImage: z.boolean().default(false),
-        }),
-      ),
-    )
-    .mutation(async ({ ctx, input }) => {
-      try {
-        let buf: Buffer = Buffer.from(
-          input.b64.split(";base64,")[1] ?? input.b64,
-          "base64",
-        );
-        if (input.isImage) {
-          buf = await sharp(buf).webp().toBuffer();
-        }
-        const placeholder = input.isImage
-          ? (await getPlaiceholder(buf)).base64
-          : undefined;
-        const objectId = crypto.randomUUID();
-        const mimeType = mime.extension(input.fileName);
-        const metadata = ctx.s3.file(objectId);
-        await metadata.write(buf, {
-          type: mimeType ? mimeType : "application/octet-stream",
-        });
+export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-        const [file] = await ctx.db
+export const fileRouter = new Elysia({ prefix: "/file" })
+  .use(userService)
+  .get(
+    "/:id",
+    async ({ params, set }) => {
+      const file = await db.query.files.findFirst({
+        where: eq(files.id, params.id),
+      });
+
+      if (!file) {
+        return error(404, "Файл не найден");
+      }
+
+      set.headers["Content-Type"] = file.contentType;
+      set.headers["Content-Disposition"] =
+        `attachment; filename="${encodeURIComponent(file.fileName)}"`;
+      return s3.file(file.id).stream();
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+    },
+  )
+  .post(
+    "/",
+    async ({ body, query }) => {
+      const arrayBuffer = await body.file.arrayBuffer();
+      let buf = Buffer.from(arrayBuffer);
+
+      if (query.isImage) {
+        buf = await sharp(buf).webp().toBuffer();
+      }
+
+      const placeholder = query.isImage
+        ? (await getPlaiceholder(buf)).base64
+        : undefined;
+
+      const mimeType = mime.extension(body.file.name);
+      const resolvedMimeType = mimeType ? mimeType : "application/octet-stream";
+
+      let id: string | undefined;
+      await db.transaction(async (trx) => {
+        const [file] = await trx
           .insert(files)
           .values({
-            ...input,
+            fileName: body.file.name,
+            fileSize: body.file.size,
+            contentType: resolvedMimeType,
             placeholder,
-            objectId,
           })
           .returning();
 
-        return {
-          id: file!.id,
-        };
-      } catch (e) {
-        logger.error(e);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Ошибка загрузки файла",
+        id = file!.id;
+
+        const metadata = s3.file(id);
+        await metadata.write(buf, {
+          type: resolvedMimeType,
         });
-      }
-    }),
-});
+      });
+
+      return {
+        id: id!,
+      };
+    },
+    {
+      body: t.Object({
+        file: t.File({
+          maxSize: MAX_FILE_SIZE,
+        }),
+      }),
+      query: t.Object({
+        isImage: t.Optional(t.Boolean()),
+      }),
+      isSignedIn: true,
+    },
+  );

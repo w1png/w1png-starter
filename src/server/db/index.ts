@@ -3,7 +3,7 @@ import postgres from "postgres";
 
 import { env } from "~/env";
 import * as schema from "./schema";
-import { logger } from "~/lib/server/logger";
+import { logger } from "~/server/logger";
 import { DefaultLogger, type LogWriter } from "drizzle-orm";
 
 const globalForDb = globalThis as unknown as {

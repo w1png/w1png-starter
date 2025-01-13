@@ -16,6 +16,8 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@elysiajs/eden": "^1.2.0",
+    "@elysiajs/websocket": "^0.2.8",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-label": "^2.1.0",
@@ -25,13 +27,11 @@
     "@t3-oss/env-nextjs": "^0.10.1",
     "@tanstack/react-query": "^5.50.0",
     "@tanstack/react-table": "^8.20.5",
-    "@trpc/client": "^11.0.0-rc.446",
-    "@trpc/react-query": "^11.0.0-rc.446",
-    "@trpc/server": "^11.0.0-rc.446",
     "better-auth": "^1.1.10",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.33.0",
+    "elysia": "^1.2.10",
     "lucide-react": "^0.460.0",
     "mime-types": "^2.1.35",
     "next": "^15.0.1",

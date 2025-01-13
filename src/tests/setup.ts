@@ -4,6 +4,8 @@ import * as schema from "~/server/db/schema";
 import { PGlite } from "@electric-sql/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { sql } from "drizzle-orm";
+import { treaty } from "@elysiajs/eden";
+import { app } from "~/server/api";
 
 const db = drizzle(new PGlite(), { schema });
 
@@ -11,6 +13,7 @@ mock.module("redis", () => {
   const store = new Map<string, string>();
   return {
     createClient: (_: { url: string }) => ({
+      // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
       connect: () => {},
       get: async (key: string) => {
         const value = store.get(key);
@@ -32,9 +35,11 @@ mock.module("redis", () => {
   };
 });
 
-mock.module("../server/email/index.ts", () => {
+mock.module("~/server/email", () => {
   return {
     email: {
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
       send: async (_: { body: any; subject: string; to: string }) => {},
     },
   };
