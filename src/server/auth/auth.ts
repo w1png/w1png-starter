@@ -1,15 +1,15 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { admin } from "better-auth/plugins";
+import { env } from "~/env";
+import type { UserRole } from "~/lib/shared/types/user";
 import { db } from "../db";
 import { email } from "../email";
 import ResetPasswordEmail from "../email/resetPasswordEmail";
-import VerificationEmail from "../email/verificationEmail";
-import { env } from "~/env";
 import SignUpEmail from "../email/signUpEmail";
-import { redis } from "../redis";
-import { admin } from "better-auth/plugins";
-import type { UserRole } from "~/lib/shared/types/user";
+import VerificationEmail from "../email/verificationEmail";
 import { logger } from "../logger";
+import { redis } from "../redis";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {

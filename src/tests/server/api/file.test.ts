@@ -1,9 +1,9 @@
-import { test, expect, describe } from "bun:test";
+import { describe, expect, test } from "bun:test";
+import fs from "fs";
 import { api } from "~/server/api";
+import { MAX_FILE_SIZE } from "~/server/api/routers/file";
 import { CreateUser } from "~/tests/create-user";
 import { FileFromBuffer } from "~/tests/utils";
-import fs from "fs";
-import { MAX_FILE_SIZE } from "~/server/api/routers/file";
 
 const testFile = FileFromBuffer(Buffer.from("test"), "test.txt");
 const testBigFile = FileFromBuffer(

@@ -1,10 +1,10 @@
+import { treaty } from "@elysiajs/eden";
 import { Elysia } from "elysia";
 import { headers as getNextHeaders } from "next/headers";
-import { fileRouter } from "./routers/file";
 import betterAuthView from "../auth/auth-view";
-import { treaty } from "@elysiajs/eden";
-import { userRouter } from "./routers/user";
 import { logger } from "../logger";
+import { fileRouter } from "./routers/file";
+import { userRouter } from "./routers/user";
 
 export const app = new Elysia({ prefix: "/api" })
   .onTransform(function log({ path, request: { method } }) {

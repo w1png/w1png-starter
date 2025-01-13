@@ -61,7 +61,10 @@ export default function SignInPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Email" {...field} />
+                    <Input
+                      placeholder="Email"
+                      {...field}
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -72,12 +75,18 @@ export default function SignInPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <PasswordInput placeholder="Пароль" {...field} />
+                    <PasswordInput
+                      placeholder="Пароль"
+                      {...field}
+                    />
                   </FormControl>
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+            >
               Войти
             </Button>
           </form>

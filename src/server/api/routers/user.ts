@@ -1,6 +1,6 @@
 import Elysia, { error } from "elysia";
-import { userMiddleware } from "../middleware/auth";
 import { logger } from "~/server/logger";
+import { userMiddleware } from "../middleware/auth";
 
 export const userService = new Elysia({ name: "user/service" })
   .derive(

@@ -1,9 +1,9 @@
-import { mock, beforeEach, spyOn } from "bun:test";
-import { drizzle } from "drizzle-orm/pglite";
-import * as schema from "~/server/db/schema";
+import { beforeEach, mock, spyOn } from "bun:test";
 import { PGlite } from "@electric-sql/pglite";
-import { migrate } from "drizzle-orm/pglite/migrator";
 import { sql } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/pglite";
+import { migrate } from "drizzle-orm/pglite/migrator";
+import * as schema from "~/server/db/schema";
 import { logger } from "~/server/logger";
 
 const db = drizzle(new PGlite(), { schema });

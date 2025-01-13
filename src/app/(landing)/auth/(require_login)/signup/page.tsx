@@ -65,7 +65,7 @@ export default function SignUpPage() {
       onSuccess() {
         setVerify(true);
       },
-      onError(error) {
+      onError(_error) {
         setLoading(false);
         toast.error("Не удалось войти в аккаунт", {
           description: "Неизвестная ошибка",
@@ -110,7 +110,10 @@ export default function SignUpPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Имя" {...field} />
+                    <Input
+                      placeholder="Имя"
+                      {...field}
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -121,7 +124,10 @@ export default function SignUpPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Email" {...field} />
+                    <Input
+                      placeholder="Email"
+                      {...field}
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -132,7 +138,10 @@ export default function SignUpPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <PasswordInput placeholder="Пароль" {...field} />
+                    <PasswordInput
+                      placeholder="Пароль"
+                      {...field}
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -151,7 +160,11 @@ export default function SignUpPage() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className=" w-full" loading={loading}>
+            <Button
+              type="submit"
+              className=" w-full"
+              loading={loading}
+            >
               Зарегистрироваться
             </Button>
           </form>
