@@ -34,7 +34,7 @@ export default function SignInPage() {
     defaultValues: {} as z.infer<typeof loginSchema>,
   });
 
-  async function OnSubmit(data: z.infer<typeof loginSchema>) {
+  async function onSubmit(data: z.infer<typeof loginSchema>) {
     await authClient.signIn.email(data, {
       onSuccess() {
         router.push("/");
@@ -52,9 +52,7 @@ export default function SignInPage() {
         <h1 className="text-2xl font-medium">Вход</h1>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit((data) => {
-              OnSubmit(data);
-            }, OnError)}
+            onSubmit={form.handleSubmit(onSubmit, OnError)}
             className="space-y-2"
           >
             <FormField
@@ -63,7 +61,10 @@ export default function SignInPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Email" {...field} />
+                    <Input
+                      placeholder="Email"
+                      {...field}
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -74,12 +75,18 @@ export default function SignInPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <PasswordInput placeholder="Пароль" {...field} />
+                    <PasswordInput
+                      placeholder="Пароль"
+                      {...field}
+                    />
                   </FormControl>
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+            >
               Войти
             </Button>
           </form>

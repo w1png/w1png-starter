@@ -2,7 +2,7 @@ import { render } from "@react-email/render";
 import nodemailer from "nodemailer";
 import type { ReactElement } from "react";
 import { env } from "~/env";
-import { logger } from "~/lib/server/logger";
+import { logger } from "~/server/logger";
 
 export class Email {
   private transporter: nodemailer.Transporter;

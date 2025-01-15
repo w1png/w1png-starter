@@ -1,10 +1,10 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
-import { env } from "~/env";
-import * as schema from "./schema";
-import { logger } from "~/lib/server/logger";
 import { DefaultLogger, type LogWriter } from "drizzle-orm";
+import { env } from "~/env";
+import { logger } from "~/server/logger";
+import * as schema from "./schema";
 
 const globalForDb = globalThis as unknown as {
   conn: postgres.Sql | undefined;

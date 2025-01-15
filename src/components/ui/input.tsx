@@ -1,8 +1,8 @@
 import * as React from "react";
 
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { cn } from "~/lib/client/utils";
 import { Button } from "./button";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 export interface InputProps extends React.ComponentProps<"input"> {
   className?: string;

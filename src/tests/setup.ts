@@ -1,9 +1,10 @@
-import { mock, beforeEach } from "bun:test";
-import { drizzle } from "drizzle-orm/pglite";
-import * as schema from "~/server/db/schema";
+import { beforeEach, mock, spyOn } from "bun:test";
 import { PGlite } from "@electric-sql/pglite";
-import { migrate } from "drizzle-orm/pglite/migrator";
 import { sql } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/pglite";
+import { migrate } from "drizzle-orm/pglite/migrator";
+import * as schema from "~/server/db/schema";
+import { logger } from "~/server/logger";
 
 const db = drizzle(new PGlite(), { schema });
 
@@ -11,12 +12,13 @@ mock.module("redis", () => {
   const store = new Map<string, string>();
   return {
     createClient: (_: { url: string }) => ({
+      // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
       connect: () => {},
       get: async (key: string) => {
         const value = store.get(key);
         return new Promise((resolve) => resolve(value));
       },
-      set: async (key: string, value: string, ttl: unknown) => {
+      set: async (key: string, value: string, _: unknown) => {
         return new Promise((resolve) => {
           store.set(key, value);
           resolve(true);
@@ -32,13 +34,19 @@ mock.module("redis", () => {
   };
 });
 
-mock.module("../server/email/index.ts", () => {
+mock.module("~/server/email", () => {
   return {
     email: {
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
       send: async (_: { body: any; subject: string; to: string }) => {},
     },
   };
 });
+
+// @ts-ignore
+// biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
+spyOn(logger, "info").mockImplementation(() => {});
 
 mock.module("../server/db", async () => {
   await migrate(db, {
@@ -61,7 +69,7 @@ mock.module("../env.js", () => {
       EMAIL_PORT: 0,
       EMAIL_USER: "test",
       EMAIL_PASSWORD: "test",
-      MAIN_ADMIN_EMAIL: "test@example.com",
+      MAIN_ADMIN_EMAIL: "admin@example.com",
       S3_REGION: process.env.S3_REGION,
       S3_ENDPOINT: process.env.S3_ENDPOINT,
       S3_BUCKET: process.env.S3_BUCKET,

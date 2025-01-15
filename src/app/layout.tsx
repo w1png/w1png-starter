@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-import { TRPCReactProvider } from "~/trpc/react";
 import { Toaster } from "~/components/ui/sonner";
+import QueryClientProviderContext from "./query-client-provider";
 
 const main_font = Inter({
   subsets: ["latin", "cyrillic"],
@@ -23,13 +23,14 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${main_font.variable} font-main`}>
+    <html
+      lang="en"
+      className={`${main_font.variable} font-main`}
+    >
       <body>
         <NuqsAdapter>
-          <TRPCReactProvider>
-            {children}
-            <Toaster />
-          </TRPCReactProvider>
+          <QueryClientProviderContext>{children}</QueryClientProviderContext>
+          <Toaster />
         </NuqsAdapter>
       </body>
     </html>

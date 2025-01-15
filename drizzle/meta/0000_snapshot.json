@@ -1,11 +1,11 @@
 {
-  "id": "a807f789-4e9b-4bec-bc2b-b3246ea75fbc",
+  "id": "75d70326-d73e-4571-bb0a-081ec64e52dd",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.project_account": {
-      "name": "project_account",
+    "public.account": {
+      "name": "account",
       "schema": "",
       "columns": {
         "id": {
@@ -89,10 +89,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "project_account_user_id_project_user_id_fk": {
-          "name": "project_account_user_id_project_user_id_fk",
-          "tableFrom": "project_account",
-          "tableTo": "project_user",
+        "account_user_id_user_id_fk": {
+          "name": "account_user_id_user_id_fk",
+          "tableFrom": "account",
+          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
@@ -140,12 +140,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "object_id": {
-          "name": "object_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -159,8 +153,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.project_session": {
-      "name": "project_session",
+    "public.session": {
+      "name": "session",
       "schema": "",
       "columns": {
         "id": {
@@ -220,10 +214,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "project_session_user_id_project_user_id_fk": {
-          "name": "project_session_user_id_project_user_id_fk",
-          "tableFrom": "project_session",
-          "tableTo": "project_user",
+        "session_user_id_user_id_fk": {
+          "name": "session_user_id_user_id_fk",
+          "tableFrom": "session",
+          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
@@ -236,8 +230,8 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "project_session_token_unique": {
-          "name": "project_session_token_unique",
+        "session_token_unique": {
+          "name": "session_token_unique",
           "nullsNotDistinct": false,
           "columns": [
             "token"
@@ -245,8 +239,8 @@
         }
       }
     },
-    "public.project_user": {
-      "name": "project_user",
+    "public.user": {
+      "name": "user",
       "schema": "",
       "columns": {
         "id": {
@@ -320,8 +314,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "project_user_email_unique": {
-          "name": "project_user_email_unique",
+        "user_email_unique": {
+          "name": "user_email_unique",
           "nullsNotDistinct": false,
           "columns": [
             "email"
@@ -329,8 +323,8 @@
         }
       }
     },
-    "public.project_verification": {
-      "name": "project_verification",
+    "public.verification": {
+      "name": "verification",
       "schema": "",
       "columns": {
         "id": {

@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS "project_account" (
+CREATE TABLE IF NOT EXISTS "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,
 	"provider_id" text NOT NULL,
@@ -20,11 +20,10 @@ CREATE TABLE IF NOT EXISTS "project_files" (
 	"file_size" integer NOT NULL,
 	"placeholder" text,
 	"content_type" varchar(255) NOT NULL,
-	"object_id" varchar(255) NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "project_session" (
+CREATE TABLE IF NOT EXISTS "session" (
 	"id" text PRIMARY KEY NOT NULL,
 	"expires_at" timestamp NOT NULL,
 	"token" text NOT NULL,
@@ -34,10 +33,10 @@ CREATE TABLE IF NOT EXISTS "project_session" (
 	"user_agent" text,
 	"user_id" text NOT NULL,
 	"impersonated_by" text,
-	CONSTRAINT "project_session_token_unique" UNIQUE("token")
+	CONSTRAINT "session_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "project_user" (
+CREATE TABLE IF NOT EXISTS "user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"email" text NOT NULL,
@@ -49,10 +48,10 @@ CREATE TABLE IF NOT EXISTS "project_user" (
 	"banned" boolean,
 	"ban_reason" text,
 	"ban_expires" timestamp,
-	CONSTRAINT "project_user_email_unique" UNIQUE("email")
+	CONSTRAINT "user_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "project_verification" (
+CREATE TABLE IF NOT EXISTS "verification" (
 	"id" text PRIMARY KEY NOT NULL,
 	"identifier" text NOT NULL,
 	"value" text NOT NULL,
@@ -62,13 +61,13 @@ CREATE TABLE IF NOT EXISTS "project_verification" (
 );
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "project_account" ADD CONSTRAINT "project_account_user_id_project_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."project_user"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "project_session" ADD CONSTRAINT "project_session_user_id_project_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."project_user"("id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

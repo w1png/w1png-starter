@@ -1,8 +1,8 @@
 stages:
   - test
   - build
-  - deploy
-  - migrate
+  # - deploy
+  # - migrate
 
 variables:
   REGISTRY: registry.w1png.ru
@@ -44,26 +44,26 @@ build:
   only:
     - master
 
-deploy:
-  stage: deploy
-  image: bitnami/kubectl:latest
-  script:
-    - kubectl delete secret REPLACE_ME-secrets -n REPLACE_ME || true
-    - kubectl create secret generic REPLACE_ME-secrets --from-literal=DATABASE_URL="$DATABASE_URL" -n REPLACE_ME
-
-    - sed -i "s|registry.w1png.ru/repo_url:.*|registry.w1png.ru/$CI_PROJECT_PATH:$CI_COMMIT_SHA|g" k8s/deployment.yaml
-    - kubectl apply -f k8s/deployment.yaml
-    - kubectl rollout restart deployment REPLACE_ME -n REPLACE_ME
-    - kubectl rollout status deployment REPLACE_ME -n REPLACE_ME
-  only:
-    - master
-
-migrate:
-  stage: migrate
-  image: node:20
-  script:
-    - npm install --legacy-peer-deps
-    - npm run db:migrate
-  only:
-    - master
-
+# deploy:
+#   stage: deploy
+#   image: bitnami/kubectl:latest
+#   script:
+#     - kubectl delete secret REPLACE_ME-secrets -n REPLACE_ME || true
+#     - kubectl create secret generic REPLACE_ME-secrets --from-literal=DATABASE_URL="$DATABASE_URL" -n REPLACE_ME
+#
+#     - sed -i "s|registry.w1png.ru/repo_url:.*|registry.w1png.ru/$CI_PROJECT_PATH:$CI_COMMIT_SHA|g" k8s/deployment.yaml
+#     - kubectl apply -f k8s/deployment.yaml
+#     - kubectl rollout restart deployment REPLACE_ME -n REPLACE_ME
+#     - kubectl rollout status deployment REPLACE_ME -n REPLACE_ME
+#   only:
+#     - master
+#
+# migrate:
+#   stage: migrate
+#   image: node:20
+#   script:
+#     - npm install --legacy-peer-deps
+#     - npm run db:migrate
+#   only:
+#     - master
+#
