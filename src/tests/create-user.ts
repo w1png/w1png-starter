@@ -1,9 +1,9 @@
 import { auth } from "~/server/auth/auth";
 
-export async function CreateUser() {
+export async function CreateUser(email?: string) {
   const response = await auth.api.signUpEmail({
     body: {
-      email: "test@example.com",
+      email: email ?? "test@example.com",
       password: "test1234",
       name: "Test User",
       role: "user",
@@ -13,7 +13,7 @@ export async function CreateUser() {
   const cookie = response.headers.get("set-cookie")!.split(";")[0]!;
 
   const user = await auth.api.signInEmail({
-    body: { email: "test@example.com", password: "test1234" },
+    body: { email: email ?? "test@example.com", password: "test1234" },
   });
 
   return {

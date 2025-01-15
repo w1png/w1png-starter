@@ -74,6 +74,7 @@ describe("file", () => {
     expect(file.response.headers.get("Content-Disposition")).toBe(
       `attachment; filename="test.txt"`,
     );
+    expect(file.data as unknown as string).toBe("test");
     expect(file.error).toBeFalsy();
     expect(file.data).toBeTruthy();
   });
@@ -87,6 +88,7 @@ describe("file", () => {
     );
     expect(file.error).toBeFalsy();
     expect(file.data).toBeTruthy();
+    expect(file.data).toHaveProperty("id");
   });
 
   test("create.image.invalid", async () => {

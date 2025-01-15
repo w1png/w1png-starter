@@ -1,4 +1,3 @@
-import type { Session, User } from "better-auth/types";
 import { auth } from "~/server/auth/auth";
 
 export const userMiddleware = async (
@@ -11,12 +10,5 @@ export const userMiddleware = async (
   }
   return {
     session: await auth.api.getSession({ headers: realHeaders }),
-  };
-};
-
-export const userInfo = (user: User | null, session: Session | null) => {
-  return {
-    user: user,
-    session: session,
   };
 };

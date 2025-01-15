@@ -1,7 +1,6 @@
 import { treaty } from "@elysiajs/eden";
 import { Elysia } from "elysia";
 import { headers as getNextHeaders } from "next/headers";
-import betterAuthView from "../auth/auth-view";
 import { logger } from "../logger";
 import { fileRouter } from "./routers/file";
 import { userRouter } from "./routers/user";
@@ -14,7 +13,6 @@ export const app = new Elysia({ prefix: "/api" })
     });
   })
   .use(userRouter)
-  .all("/auth/*", betterAuthView)
   .use(fileRouter);
 
 export type App = typeof app;

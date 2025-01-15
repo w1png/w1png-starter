@@ -8,7 +8,7 @@
     "build": "bunx --bun next build",
     "start": "next start",
     "format": "biome check ./src/ --fix --unsafe",
-    "test": "bun test --reporter=junit --reporter-outfile=./bun.xml --preload ./src/tests/setup.ts",
+    "test": "bun test --reporter=junit --reporter-outfile=./bun.xml --preload ./src/tests/setup.ts --coverage",
     "auth:generate": "bunx @better-auth/cli generate --config ./src/server/auth/auth.ts --output ./src/server/db/auth-schema.ts",
     "email": "email dev --dir src/server/email",
     "typecheck": "tsc --noEmit",

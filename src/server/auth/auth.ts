@@ -87,7 +87,11 @@ export const auth = betterAuth({
       });
     },
   },
-  plugins: [admin()],
+  plugins: [
+    admin({
+      defaultRole: "user",
+    }),
+  ],
 });
 
 export type Session = Awaited<ReturnType<(typeof auth)["api"]["getSession"]>>;

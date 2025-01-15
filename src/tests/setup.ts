@@ -69,7 +69,7 @@ mock.module("../env.js", () => {
       EMAIL_PORT: 0,
       EMAIL_USER: "test",
       EMAIL_PASSWORD: "test",
-      MAIN_ADMIN_EMAIL: "test@example.com",
+      MAIN_ADMIN_EMAIL: "admin@example.com",
       S3_REGION: process.env.S3_REGION,
       S3_ENDPOINT: process.env.S3_ENDPOINT,
       S3_BUCKET: process.env.S3_BUCKET,
