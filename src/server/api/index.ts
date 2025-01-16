@@ -1,17 +1,13 @@
 import { treaty } from "@elysiajs/eden";
 import { Elysia } from "elysia";
 import { headers as getNextHeaders } from "next/headers";
-import { logger } from "../logger";
 import { fileRouter } from "./routers/file";
 import { userRouter } from "./routers/user";
+import { ApiErrorLogger } from "./middleware/logger";
 
 export const app = new Elysia({ prefix: "/api" })
-  .onTransform(function log({ path, request: { method } }) {
-    logger.info({
-      path,
-      method,
-    });
-  })
+  .onTransform(ApiErrorLogger)
+  .onError(ApiErrorLogger)
   .use(userRouter)
   .use(fileRouter);
 
