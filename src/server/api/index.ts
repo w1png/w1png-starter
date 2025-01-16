@@ -16,7 +16,7 @@ export const app = new Elysia({ prefix: "/api" })
   .use(fileRouter);
 
 export type App = typeof app;
-export const api = treaty(app);
+export const api = treaty(app).api;
 
 export async function headers(): Promise<Record<string, string | undefined>> {
   const h = await getNextHeaders();
