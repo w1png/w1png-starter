@@ -14,7 +14,7 @@ export default function LandingPage() {
   const uploadFileResolver = useMutation({
     mutationKey: ["uploadFile"],
     mutationFn: async (file: File) => {
-      const f = await api.api.file.index.post(
+      const f = await api.file.index.post(
         { file },
         { query: { isImage: true } },
       );
