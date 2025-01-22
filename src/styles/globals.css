@@ -1,30 +1,66 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --nav-height: 4rem;
+@plugin 'tailwindcss-animate';
+
+@variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: var(--font-main), ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --radius: 0.5rem;
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --color-background: hsl(232 39% 12%);
+  --color-foreground: hsl(0 0% 100%);
+
+  --color-primary: hsl(0, 0%, 100%, 0.05);
+  --color-primary-foreground: var(--color-white);
+
+  --color-accent: hsl(0, 0%, 100%, 0.05);
+  --color-accent-foreground: var(--color-white);
+
+  --color-secondary: hsl(0, 0%, 100%);
+  --color-secondary-foreground: var(--color-black);
+
+  --color-card: var(--color-secondary);
+  --color-card-foreground: var(--color-foreground);
+  --color-popover: var(--color-secondary);
+  --color-popover-foreground: var(--color-foreground);
+
+  --color-muted: var(--color-stone-200);
+  --color-muted-foreground: var(--color-stone-400);
+  --color-destructive: var(--color-red-400);
+
+  --color-destructive-foreground: var(--color-white);
+
+  --color-border: var(--color-gray-200);
+  --color-input: hsl(0, 0%, 100%, 0.1);
+  --color-ring: hsl(20 14.3% 4.1%);
+
+  --color-chart-1: hsl(12 76% 61%);
+  --color-chart-2: hsl(173 58% 39%);
+  --color-chart-3: hsl(197 37% 24%);
+  --color-chart-4: hsl(43 74% 66%);
+  --color-chart-5: hsl(27 87% 67%);
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+
+  @media (width >=theme(--breakpoint-sm)) {
+    max-width: none;
+  }
+
+  @media (width >=1400px) {
+    max-width: 1400px;
+  }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-
-  ::-webkit-scrollbar {
-    display: none;
-  }
-
-  @media screen and (-webkit-min-device-pixel-ratio: 0) {
-    select,
-    textarea,
-    input {
-      font-size: 16px !important;
-    }
-  }
 
   *,
   ::after,
@@ -32,5 +68,113 @@
   ::backdrop,
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
+  }
+
+  ul {
+    @apply list-disc opacity-100 pl-4;
+  }
+
+  ol {
+    @apply list-decimal text-white opacity-100 pl-4;
+  }
+
+
+  .tiptap {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+
+    blockquote {
+      @apply p-6 bg-white/10 my-2 rounded-2xl;
+
+      ul {
+        @apply opacity-100;
+      }
+
+      ol {
+        @apply opacity-100;
+      }
+
+      p {
+        @apply opacity-100;
+      }
+    }
+
+    @apply focus-visible:outline-none
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  h1 {
+    @apply sm:text-6xl text-2xl
+  }
+
+  h2 {
+    @apply sm:text-5xl text-2xl
+  }
+
+  h4 {
+    @apply text-2xl font-semibold
+  }
+
+  p {
+    @apply text-white opacity-60 text-[16px] font-normal
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media screen and (-webkit-min-device-pixel-ratio: 0) {
+
+    select,
+    textarea,
+    input {
+      font-size: 16px !important;
+    }
+  }
+
+
+}
+
+@layer utilities {
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+}
+
+@animate {
+  shine: "shine var(--duration) infinite linear"
+}
+
+@keyframes shine {
+  0% {
+    background-position: "0% 0%";
+  }
+
+  50% {
+    background-position: "100% 100%";
+  }
+
+  to {
+    background-position: "0% 0%";
   }
 }
