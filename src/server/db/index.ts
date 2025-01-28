@@ -1,23 +1,9 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { drizzle } from "drizzle-orm/bun-sql";
 
 import { DefaultLogger, type LogWriter } from "drizzle-orm";
 import { env } from "~/env";
 import { logger } from "~/server/logger";
 import * as schema from "./schema";
-
-const globalForDb = globalThis as unknown as {
-  conn: postgres.Sql | undefined;
-};
-
-const conn =
-  globalForDb.conn ??
-  postgres(env.DATABASE_URL, {
-    onnotice: (n) => {
-      logger.warn(n);
-    },
-  });
-if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 
 class WinstonLogger implements LogWriter {
   write(message: string) {
@@ -25,7 +11,7 @@ class WinstonLogger implements LogWriter {
   }
 }
 
-export const db = drizzle(conn, {
+export const db = drizzle(env.DATABASE_URL, {
   schema,
   logger: new DefaultLogger({ writer: new WinstonLogger() }),
 });
