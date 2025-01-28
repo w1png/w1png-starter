@@ -21,14 +21,14 @@ const testImage = FileFromBuffer(
 
 describe("file", () => {
   test("get.notFound", async () => {
-    const file = await api.api.file({ id: "123" }).get();
+    const file = await api.file({ id: "123" }).get();
     expect(file.error?.status).toBe(404);
   });
 
   test("create.notImage", async () => {
     const { headers } = await CreateUser();
 
-    const file = await api.api.file.index.post(
+    const file = await api.file.index.post(
       { file: testFile },
       { headers, query: { isImage: false } },
     );
@@ -39,13 +39,13 @@ describe("file", () => {
   test("get.unauthorized", async () => {
     const { headers } = await CreateUser();
 
-    const uploadedFile = await api.api.file.index.post(
+    const uploadedFile = await api.file.index.post(
       { file: testFile },
       { headers, query: { isImage: false } },
     );
     expect(uploadedFile.data).toBeTruthy();
 
-    const file = await api.api.file({ id: uploadedFile.data!.id }).get();
+    const file = await api.file({ id: uploadedFile.data!.id }).get();
     expect(file.response.headers.get("Content-Type")).toBe(
       "application/octet-stream, text/event-stream; charset=utf-8",
     );
@@ -59,13 +59,13 @@ describe("file", () => {
   test("get.autorized", async () => {
     const { headers } = await CreateUser();
 
-    const uploadedFile = await api.api.file.index.post(
+    const uploadedFile = await api.file.index.post(
       { file: testFile },
       { headers, query: { isImage: false } },
     );
     expect(uploadedFile.data).toBeTruthy();
 
-    const file = await api.api
+    const file = await api
       .file({ id: uploadedFile.data!.id })
       .get({ headers });
     expect(file.response.headers.get("Content-Type")).toBe(
@@ -82,7 +82,7 @@ describe("file", () => {
   test("create.image", async () => {
     const { headers } = await CreateUser();
 
-    const file = await api.api.file.index.post(
+    const file = await api.file.index.post(
       { file: testImage },
       { headers, query: { isImage: true } },
     );
@@ -94,7 +94,7 @@ describe("file", () => {
   test("create.image.invalid", async () => {
     const { headers } = await CreateUser();
 
-    const res = await api.api.file.index.post(
+    const res = await api.file.index.post(
       { file: testFile },
       { headers, query: { isImage: true } },
     );
@@ -105,7 +105,7 @@ describe("file", () => {
   test("create.image.tooBig", async () => {
     const { headers } = await CreateUser();
 
-    const res = await api.api.file.index.post(
+    const res = await api.file.index.post(
       { file: testBigFile },
       { headers, query: { isImage: true } },
     );

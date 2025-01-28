@@ -5,7 +5,7 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
-import * as authSchema from "./auth-schema";
+export {user, session, account, verification} from "./auth-schema"
 
 export const createTable = pgTableCreator((name) => `project_${name}`);
 
@@ -20,8 +20,3 @@ export const files = createTable("files", {
   contentType: varchar("content_type", { length: 255 }).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
-
-export const user = authSchema.user;
-export const session = authSchema.session;
-export const account = authSchema.account;
-export const verification = authSchema.verification;
