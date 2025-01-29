@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bun run --bun next dev",
     "build": "bunx --bun next build",
-    "start": "next start",
+    "start": "bunx --bun next start",
     "format": "biome check ./src/ --fix --unsafe",
     "test": "bun test --reporter=junit --reporter-outfile=./bun.xml --preload ./src/tests/setup.ts --coverage",
     "auth:generate": "bunx @better-auth/cli generate --config ./src/server/auth/auth.ts --output ./src/server/db/auth-schema.ts",
@@ -35,7 +35,7 @@
     "elysia": "^1.2.10",
     "lucide-react": "^0.460.0",
     "mime-types": "^2.1.35",
-    "next": "^15.0.1",
+    "next": "^15.2.0",
     "next-themes": "^0.4.4",
     "nodemailer": "^6.9.16",
     "nuqs": "^2.2.3",
