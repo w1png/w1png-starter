@@ -1,6 +1,6 @@
 name: Run Tests
 
-n:
+on:
   push:
     branches: [master]
   pull_request:
