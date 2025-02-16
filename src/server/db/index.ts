@@ -1,4 +1,4 @@
-import { drizzle } from "drizzle-orm/bun-sql";
+import { type BunSQLDatabase, drizzle } from "drizzle-orm/bun-sql";
 
 import { DefaultLogger, type LogWriter } from "drizzle-orm";
 import { env } from "~/env";
@@ -11,7 +11,15 @@ class WinstonLogger implements LogWriter {
   }
 }
 
-export const db = drizzle(env.DATABASE_URL, {
-  schema,
-  logger: new DefaultLogger({ writer: new WinstonLogger() }),
-});
+const globalForDB = globalThis as unknown as {
+  db: BunSQLDatabase;
+};
+
+globalForDB.db =
+  globalForDB.db ??
+  drizzle(env.DATABASE_URL, {
+    schema,
+    logger: new DefaultLogger({ writer: new WinstonLogger() }),
+  });
+
+export const db = globalForDB.db;
