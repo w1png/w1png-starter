@@ -1,4 +1,4 @@
-import { auth } from "~/server/auth/auth";
+import { GetTelegramAuth } from "~/server/telegram/auth";
 
 export const userMiddleware = async (
   headers: Record<string, string | undefined>,
@@ -8,7 +8,10 @@ export const userMiddleware = async (
     if (value === undefined) continue;
     realHeaders.set(key, value);
   }
+
   return {
-    session: await auth.api.getSession({ headers: realHeaders }),
+    session: {
+      user: await GetTelegramAuth(realHeaders),
+    },
   };
 };

@@ -84,6 +84,5 @@ export const fileRouter = new Elysia({ prefix: "/file" })
       query: t.Object({
         isImage: t.Optional(t.Boolean()),
       }),
-      isSignedIn: true,
     },
   );
