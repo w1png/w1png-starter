@@ -8,8 +8,8 @@ import { logger } from "~/server/logger";
 
 const db = drizzle(new PGlite(), { schema });
 
+let store = new Map<string, string>();
 mock.module("redis", () => {
-  const store = new Map<string, string>();
   return {
     createClient: (_: { url: string }) => ({
       // biome-ignore lint/suspicious/noEmptyBlockStatements: <explanation>
@@ -81,6 +81,7 @@ mock.module("../env.js", () => {
 });
 
 beforeEach(async () => {
+  store = new Map<string, string>();
   try {
     const res = await db.execute(
       sql`SELECT tablename FROM pg_tables WHERE schemaname = 'public'`,
