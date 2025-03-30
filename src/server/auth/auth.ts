@@ -94,4 +94,75 @@ export const auth = betterAuth({
   ],
 });
 
-export type Session = Awaited<ReturnType<(typeof auth)["api"]["getSession"]>>;
+export type Session = NonNullable<
+  Awaited<ReturnType<(typeof auth)["api"]["getSession"]>>
+>;
+export type User = Session["user"];
+
+export async function GetCachedSession(userId: string) {
+  const sessionTokensRaw = await redis.get(`active-sessions-${userId}`);
+
+  if (!sessionTokensRaw) {
+    logger.warn({
+      message: "unable to invalidate session",
+    });
+
+    return;
+  }
+
+  const sessionTokens = (
+    JSON.parse(sessionTokensRaw) as {
+      token: string;
+      expiresAt: number;
+    }[]
+  ).map((t) => t.token);
+  if (!sessionTokens[0]) {
+    logger.warn({
+      message: "unable to invalidate session",
+      details: "session tokens are empty",
+    });
+    return;
+  }
+
+  let tokenCache: string | null = null;
+  for (const token of sessionTokens) {
+    tokenCache = await redis.get(token);
+    if (tokenCache) break;
+  }
+  if (!tokenCache) {
+    logger.warn({
+      message: "token cache not found",
+    });
+
+    return;
+  }
+
+  const session = JSON.parse(tokenCache) as Session;
+
+  return { session, sessionTokens };
+}
+
+export async function UpdateCachedSession(
+  userId: string,
+  newSession: (oldSession: Session) => Promise<Session> | Session,
+) {
+  const sess = await GetCachedSession(userId);
+  if (sess) {
+    const { sessionTokens, session } = sess;
+    const newSess = newSession(session);
+    await Promise.all(
+      sessionTokens.map(async (token) => {
+        await redis.set(token, JSON.stringify(newSess));
+      }),
+    );
+    logger.info({
+      message: "updated cached user sessions",
+      sessionTokens,
+      newSession: newSess,
+    });
+  } else {
+    logger.warn({
+      message: "unable to update cached user session",
+    });
+  }
+}
