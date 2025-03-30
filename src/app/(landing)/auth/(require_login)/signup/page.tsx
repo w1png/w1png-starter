@@ -8,7 +8,7 @@ import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "~/components/ui/form";
 import { Input, PasswordInput } from "~/components/ui/input";
-import { authClient, authErrorCodes } from "~/lib/client/auth-client";
+import { authClient, errorCodes } from "~/lib/client/auth-client";
 import { OnError } from "~/lib/client/on_error";
 
 export default function SignUpPage() {
@@ -61,21 +61,30 @@ export default function SignUpPage() {
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    await authClient.signUp.email(data, {
+    const { error } = await authClient.signUp.email(data, {
       onSuccess() {
         setVerify(true);
       },
       onError(_error) {
         setLoading(false);
-        toast.error("Не удалось войти в аккаунт", {
-          description: "Неизвестная ошибка",
-          /*authErrorCodes[error.error.message]?.ru ??*/
-        });
       },
       onRequest() {
         setLoading(true);
       },
     });
+
+    if (error) {
+      toast.error(
+        "Не удалось создать аккаунт",
+        error.code
+          ? {
+              description:
+                // @ts-ignore
+                errorCodes[error.code],
+            }
+          : undefined,
+      );
+    }
   };
 
   if (verify) {
@@ -110,10 +119,7 @@ export default function SignUpPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input
-                      placeholder="Имя"
-                      {...field}
-                    />
+                    <Input placeholder="Имя" {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -124,10 +130,7 @@ export default function SignUpPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input
-                      placeholder="Email"
-                      {...field}
-                    />
+                    <Input placeholder="Email" {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -138,10 +141,7 @@ export default function SignUpPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <PasswordInput
-                      placeholder="Пароль"
-                      {...field}
-                    />
+                    <PasswordInput placeholder="Пароль" {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -160,11 +160,7 @@ export default function SignUpPage() {
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              className=" w-full"
-              loading={loading}
-            >
+            <Button type="submit" className=" w-full" loading={loading}>
               Зарегистрироваться
             </Button>
           </form>

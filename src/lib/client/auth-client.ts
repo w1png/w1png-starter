@@ -9,17 +9,19 @@ export const authClient = createAuthClient({
   baseURL,
 });
 
-export const authErrorCodes = {
-  // [authClient.$ERROR_CODES.USER_ALREADY_EXISTS]: {
-  //   ru: "Пользователь с таким email уже существует",
-  // },
-  // [authClient.$ERROR_CODES.EMAIL_NOT_VERIFIED]: {
-  //   ru: "Подтвердите ваш email для входа в аккаунт",
-  // },
-  // [authClient.$ERROR_CODES.INVALID_PASSWORD]: {
-  //   ru: "Неверный пароль",
-  // },
-  // [authClient.$ERROR_CODES.INVALID_EMAIL]: {
-  //   ru: "Неверный email или пароль",
-  // },
-};
+export type ErrorTypes = Partial<
+  Record<keyof typeof authClient.$ERROR_CODES, string>
+>;
+
+export const errorCodes = {
+  USER_ALREADY_EXISTS: "Пользователь с таким Email уже существует",
+  USER_EMAIL_NOT_FOUND: "Пользователь с таким Email не найден",
+  PASSWORD_TOO_LONG: "Пароль слишком длинный",
+  PASSWORD_TOO_SHORT: "Пароль слишком короткий",
+  INVALID_EMAIL: "Неверный формат Email",
+  ACCOUNT_NOT_FOUND: "Аккаунт не найден",
+  INVALID_EMAIL_OR_PASSWORD: "Неверный Email или пароль",
+  INVALID_PASSWORD: "Неверный пароль",
+  EMAIL_CAN_NOT_BE_UPDATED: "Не удалось обновить Email",
+  EMAIL_NOT_VERIFIED: "Email не подтвержден",
+} satisfies ErrorTypes;

@@ -8,7 +8,7 @@ import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Form, FormControl, FormField, FormItem } from "~/components/ui/form";
 import { Input, PasswordInput } from "~/components/ui/input";
-import { authClient } from "~/lib/client/auth-client";
+import { authClient, errorCodes } from "~/lib/client/auth-client";
 import { OnError } from "~/lib/client/on_error";
 
 export default function SignInPage() {
@@ -35,15 +35,24 @@ export default function SignInPage() {
   });
 
   async function onSubmit(data: z.infer<typeof loginSchema>) {
-    await authClient.signIn.email(data, {
+    const { error } = await authClient.signIn.email(data, {
       onSuccess() {
         router.push("/");
       },
-      onError(error) {
-        console.error(error);
-        toast.error("Не удалось войти в аккаунт");
-      },
     });
+
+    if (error) {
+      toast.error(
+        "Не удалось войти в аккаунт аккаунт",
+        error.code
+          ? {
+              description:
+                // @ts-ignore
+                errorCodes[error.code],
+            }
+          : undefined,
+      );
+    }
   }
 
   return (
@@ -61,10 +70,7 @@ export default function SignInPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input
-                      placeholder="Email"
-                      {...field}
-                    />
+                    <Input placeholder="Email" {...field} />
                   </FormControl>
                 </FormItem>
               )}
@@ -75,18 +81,12 @@ export default function SignInPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <PasswordInput
-                      placeholder="Пароль"
-                      {...field}
-                    />
+                    <PasswordInput placeholder="Пароль" {...field} />
                   </FormControl>
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              className="w-full"
-            >
+            <Button type="submit" className="w-full">
               Войти
             </Button>
           </form>

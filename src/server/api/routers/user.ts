@@ -38,6 +38,7 @@ export const userService = new Elysia({ name: "user/service" })
   });
 
 const betterAuthView = (context: Context) => {
+  console.log({ context });
   const BETTER_AUTH_ACCEPT_METHODS = ["POST", "GET"];
   if (BETTER_AUTH_ACCEPT_METHODS.includes(context.request.method)) {
     return auth.handler(context.request);
@@ -46,7 +47,10 @@ const betterAuthView = (context: Context) => {
   }
 };
 
-export const userRouter = new Elysia({ prefix: "/user" })
+const userRouterPrefix = new Elysia({ prefix: "/user" })
   .use(userService)
+  .get("/session", ({ session }) => session);
+
+export const userRouter = new Elysia()
   .all("/auth/*", betterAuthView)
-  .get("/", ({ session }) => session);
+  .use(userRouterPrefix);
