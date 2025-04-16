@@ -1,15 +1,13 @@
 import {
   integer,
-  pgTableCreator,
+  pgTable,
   text,
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
 export { user, session, account, verification } from "./auth-schema";
 
-export const createTable = pgTableCreator((name) => `project_${name}`);
-
-export const files = createTable("files", {
+export const files = pgTable("files", {
   id: varchar("id", { length: 255 })
     .notNull()
     .primaryKey()
