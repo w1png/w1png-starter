@@ -1,5 +1,8 @@
+"use client";
+
 import { type VariantProps, cva } from "class-variance-authority";
 import { Loader as LoaderSpinner } from "lucide-react";
+import { useLinkStatus } from "next/link";
 import { cn } from "~/lib/client/utils";
 
 const loaderVariants = cva("", {
@@ -26,4 +29,14 @@ export default function Loader({ size, ...props }: LoaderProps) {
       <LoaderSpinner className={loaderVariants({ size })} />
     </span>
   );
+}
+
+export function LinkLoader(props: LoaderProps) {
+  const { pending } = useLinkStatus();
+
+  console.log({ pending });
+
+  if (pending) return <Loader {...props} />;
+
+  return null;
 }
