@@ -1,7 +1,7 @@
 import { env } from "~/env";
 
 const globalForS3 = globalThis as unknown as {
-  s3: typeof Bun.S3Client | undefined;
+  s3: Bun.S3Client | undefined;
 };
 
 export const s3 =
