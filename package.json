@@ -1,71 +1,31 @@
 {
-  "name": "project",
-  "version": "0.1.0",
+  "name": "test-orpc-tanstack-start",
   "private": true,
-  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "bun run --bun next dev --turbopack",
-    "build": "bunx --bun next build",
-    "start": "bunx --bun next start",
-    "format": "biome check ./src/ --fix --unsafe",
-    "test": "bun test --reporter=junit --reporter-outfile=./bun.xml --preload ./src/tests/setup.ts --coverage",
-    "auth:generate": "bunx @better-auth/cli generate --config ./src/server/auth/auth.ts --output ./src/server/db/auth-schema.ts",
-    "email": "email dev --dir src/server/email",
-    "typecheck": "tsc --noEmit",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push"
+    "check": "biome check --write .",
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:native": "turbo -F native dev",
+    "dev:web": "turbo -F web dev",
+    "dev:server": "turbo -F server dev",
+    "db:push": "turbo -F server db:push",
+    "db:studio": "turbo -F server db:studio",
+    "db:generate": "turbo -F server db:generate",
+    "db:migrate": "turbo -F server db:migrate"
   },
   "dependencies": {
-    "@elysiajs/eden": "^1.2.0",
-    "@hookform/resolvers": "^3.9.1",
-    "@radix-ui/react-dialog": "^1.1.2",
-    "@radix-ui/react-label": "^2.1.0",
-    "@radix-ui/react-slot": "^1.1.0",
-    "@react-email/components": "^0.0.32",
-    "@react-email/render": "^1.0.4",
-    "@t3-oss/env-nextjs": "^0.10.1",
-    "@tanstack/react-query": "^5.50.0",
-    "@tanstack/react-table": "^8.20.5",
-    "better-auth": "^1.1.10",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.1.1",
-    "drizzle-orm": "^0.41.0",
-    "elysia": "^1.2.10",
-    "lucide-react": "^0.460.0",
-    "mime-types": "^2.1.35",
-    "next": "^15.3.0",
-    "next-themes": "^0.4.4",
-    "nodemailer": "^6.9.16",
-    "nuqs": "^2.2.3",
-    "plaiceholder": "^3.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-hook-form": "^7.53.2",
-    "server-only": "^0.0.1",
-    "sharp": "^0.33.5",
-    "sonner": "^1.7.0",
-    "superjson": "^2.2.1",
-    "tailwind-merge": "^2.5.5",
-    "tailwindcss-animate": "^1.0.7",
-    "winston": "^3.17.0",
-    "zod": "^3.23.8"
+    "@react-email/components": "^0.1.1",
+    "nodemailer": "^7.0.3"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.2.15",
-    "@types/bun": "^1.2.9",
-    "@types/mime-types": "^2.1.4",
+    "@biomejs/biome": "^2.0.0",
     "@types/nodemailer": "^6.4.17",
-    "@types/react": "npm:types-react@rc",
-    "@types/react-dom": "npm:types-react-dom@rc",
-    "bun": "^1.2.9",
-    "drizzle-kit": "^0.30.6",
-    "postcss": "^8.4.39",
-    "react-email": "^3.0.5",
-    "tailwindcss": "^3.4.3",
-    "typescript": "^5.5.3"
+    "turbo": "^2.5.4"
   },
-  "ct3aMetadata": {
-    "initVersion": "7.38.1"
-  }
+  "packageManager": "bun@1.2.17"
 }
