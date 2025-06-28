@@ -1,31 +1,31 @@
 {
-  "name": "test-orpc-tanstack-start",
-  "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "scripts": {
-    "check": "biome check --write .",
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "check-types": "turbo check-types",
-    "dev:native": "turbo -F native dev",
-    "dev:web": "turbo -F web dev",
-    "dev:server": "turbo -F server dev",
-    "db:push": "turbo -F server db:push",
-    "db:studio": "turbo -F server db:studio",
-    "db:generate": "turbo -F server db:generate",
-    "db:migrate": "turbo -F server db:migrate"
-  },
-  "dependencies": {
-    "@react-email/components": "^0.1.1",
-    "nodemailer": "^7.0.3"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.0.0",
-    "@types/nodemailer": "^6.4.17",
-    "turbo": "^2.5.4"
-  },
-  "packageManager": "bun@1.2.17"
+	"name": "w1png-project",
+	"private": true,
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"scripts": {
+		"check": "biome check --write .",
+		"dev": "turbo dev",
+		"build": "turbo build",
+		"check-types": "turbo check-types",
+		"dev:native": "turbo -F native dev",
+		"dev:web": "turbo -F web dev",
+		"dev:server": "turbo -F server dev",
+		"db:push": "turbo -F server db:push",
+		"db:studio": "turbo -F server db:studio",
+		"db:generate": "turbo -F server db:generate",
+		"db:migrate": "turbo -F server db:migrate"
+	},
+	"dependencies": {
+		"@react-email/components": "^0.1.1",
+		"nodemailer": "^7.0.3"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.0.0",
+		"@types/nodemailer": "^6.4.17",
+		"turbo": "^2.5.4"
+	},
+	"packageManager": "bun@1.2.17"
 }
