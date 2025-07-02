@@ -1,3 +1,5 @@
+// import { cron } from "@elysiajs/cron";
+
 import "dotenv/config";
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
@@ -8,12 +10,23 @@ import { env } from "./lib/env";
 import { appRouter } from "./lib/orpc/routers";
 import { ResponseHeadersPlugin } from "@orpc/server/plugins";
 import { fileRouter } from "./lib/orpc/routers/file";
+import { ApiErrorLogger } from "./lib/logger/apiLogger";
 
 const handler = new RPCHandler(appRouter, {
 	plugins: [new ResponseHeadersPlugin()],
 });
 
 const app = new Elysia()
+	.onError(ApiErrorLogger)
+	// .use(
+	// 	cron({
+	// 		name: "something",
+	// 		pattern: "*/10 * * * * *",
+	// 		run: async () => {
+	// 			console.log("Cron job ran");
+	// 		},
+	// 	}),
+	// )
 	.use(
 		cors({
 			origin: env.CORS_ORIGIN || "",
@@ -27,7 +40,7 @@ const app = new Elysia()
 		if (["POST", "GET"].includes(request.method)) {
 			return auth.handler(request);
 		}
-		context.error(405);
+		context.status(405);
 	})
 	.all("/rpc*", async (context) => {
 		const { response } = await handler.handle(context.request, {
