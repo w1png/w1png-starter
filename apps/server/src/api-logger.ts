@@ -1,9 +1,9 @@
+import { logger } from "@lunarweb/logger";
 import type { ValidationError } from "elysia";
-import { logger } from ".";
 
 const prettyLog = process.env.NODE_ENV !== "production";
 
-export function ApiErrorLogger({
+export function ApiLogger({
 	request,
 	path,
 	error,
@@ -53,7 +53,7 @@ export function ApiErrorLogger({
 				path: `${method.toUpperCase()}:${path}`,
 				error,
 			});
-			prettyLog && console.error(`End server error \n`);
+			prettyLog && console.error("End server error \n");
 			return;
 	}
 }

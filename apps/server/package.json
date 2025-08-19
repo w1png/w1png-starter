@@ -7,11 +7,7 @@
 		"check-types": "tsc --noEmit",
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
 		"dev": "bun run --hot src/index.ts",
-		"start": "bun run dist/src/index.js",
-		"db:push": "drizzle-kit push",
-		"db:studio": "drizzle-kit studio",
-		"db:generate": "drizzle-kit generate",
-		"db:migrate": "drizzle-kit migrate"
+		"start": "bun run dist/src/index.js"
 	},
 	"dependencies": {
 		"@elysiajs/cors": "^1.2.0",
@@ -25,7 +21,13 @@
 		"pg": "^8.14.1",
 		"sharp": "^0.34.2",
 		"zod": "^3.25.16",
-		"@lunarweb/shared": "1.0.0"
+		"@lunarweb/shared": "workspace:*",
+		"@lunarweb/env": "workspace:*",
+		"@lunarweb/email": "workspace:*",
+		"@lunarweb/logger": "workspace:*",
+		"@lunarweb/redis": "workspace:*",
+		"@lunarweb/files": "workspace:*",
+		"@lunarweb/database": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/bun": "^1.2.6",

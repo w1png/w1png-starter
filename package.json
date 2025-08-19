@@ -1,5 +1,5 @@
 {
-	"name": "w1png-project",
+	"name": "lunarweb-project",
 	"private": true,
 	"workspaces": [
 		"apps/*",
@@ -10,22 +10,13 @@
 		"dev": "turbo dev",
 		"build": "turbo build",
 		"check-types": "turbo check-types",
-		"dev:native": "turbo -F native dev",
-		"dev:web": "turbo -F web dev",
-		"dev:server": "turbo -F server dev",
-		"db:push": "turbo -F server db:push",
-		"db:studio": "turbo -F server db:studio",
-		"db:generate": "turbo -F server db:generate",
-		"db:migrate": "turbo -F server db:migrate"
-	},
-	"dependencies": {
-		"@react-email/components": "^0.1.1",
-		"bullmq": "^5.56.0",
-		"nodemailer": "^7.0.3"
+		"db:push": "turbo -F @lunarweb/database db:push",
+		"db:studio": "turbo -F @lunarweb/database db:studio",
+		"db:generate": "turbo -F @lunarweb/database db:generate",
+		"db:migrate": "turbo -F @lunarweb/database db:migrate"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.0",
-		"@types/nodemailer": "^6.4.17",
 		"turbo": "^2.5.4"
 	},
 	"packageManager": "bun@1.2.17"

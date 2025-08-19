@@ -1,5 +1,5 @@
 {
-	"name": "@lunarweb/shared",
+	"name": "@lunarweb/redis",
 	"module": "src/index.ts",
 	"type": "module",
 	"scripts": {
@@ -7,9 +7,9 @@
 		"build": "tsc"
 	},
 	"exports": {
-		"./schemas": {
-			"types": "./src/schemas/index.ts",
-			"default": "./dist/schemas/index.js"
+		".": {
+			"types": "./src/index.ts",
+			"default": "./dist/index.js"
 		}
 	},
 	"devDependencies": {
@@ -17,8 +17,5 @@
 	},
 	"peerDependencies": {
 		"typescript": "^5"
-	},
-	"dependencies": {
-		"zod": "^4.0.17"
 	}
 }

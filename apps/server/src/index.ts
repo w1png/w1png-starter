@@ -1,23 +1,23 @@
 // import { cron } from "@elysiajs/cron";
 
 import "dotenv/config";
-import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { RPCHandler } from "@orpc/server/fetch";
-import { auth } from "./lib/auth/auth";
-import { createContext } from "./lib/orpc/context";
-import { env } from "./lib/env";
-import { appRouter } from "./lib/orpc/routers";
 import { ResponseHeadersPlugin } from "@orpc/server/plugins";
-import { fileRouter } from "./lib/orpc/routers/file";
-import { ApiErrorLogger } from "./lib/logger/apiLogger";
+import { Elysia } from "elysia";
+import { appRouter } from "./orpc/routers";
+import { ApiLogger } from "./api-logger";
+import { env } from "@lunarweb/env";
+import { auth } from "./auth/auth";
+import { createContext } from "./orpc/context";
+import { fileRouter } from "./orpc/routers/file";
 
 const handler = new RPCHandler(appRouter, {
 	plugins: [new ResponseHeadersPlugin()],
 });
 
 const app = new Elysia()
-	.onError(ApiErrorLogger)
+	.onError(ApiLogger)
 	// .use(
 	// 	cron({
 	// 		name: "something",

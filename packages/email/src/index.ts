@@ -1,8 +1,8 @@
+import { env } from "@lunarweb/env";
+import { logger } from "@lunarweb/logger";
 import { render } from "@react-email/render";
 import nodemailer from "nodemailer";
 import type { ReactElement } from "react";
-import { env } from "../env";
-import { logger } from "../logger";
 
 export class Email {
 	private transporter: nodemailer.Transporter;

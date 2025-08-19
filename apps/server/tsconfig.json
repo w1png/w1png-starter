@@ -16,10 +16,5 @@
 		"composite": true,
 		"jsx": "react-jsx"
 	},
-	"include": ["src/**/*"],
-	"references": [
-		{
-			"path": "../../packages/shared/tsconfig.json"
-		}
-	]
+	"include": ["src/**/*"]
 }
