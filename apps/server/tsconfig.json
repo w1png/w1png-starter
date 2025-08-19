@@ -1,20 +1,25 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"module": "ESNext",
-		"moduleResolution": "bundler",
-		"verbatimModuleSyntax": true,
-		"strict": true,
-		"skipLibCheck": true,
-		"baseUrl": ".",
-		"paths": {
-			"@/*": ["./src/*"],
-			"@lunarweb/shared": ["../../packages/shared/src/index.ts"]
-		},
-		"outDir": "./dist",
-		"types": ["bun"],
-		"composite": true,
-		"jsx": "react-jsx"
-	},
-	"include": ["src/**/*"]
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "outDir": "./dist",
+    "types": [
+      "bun"
+    ],
+    "composite": true,
+    "jsx": "react-jsx"
+  },
+  "include": [
+    "src/**/*"
+  ]
 }
