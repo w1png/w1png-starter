@@ -1,17 +1,19 @@
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
+import type { RouterClient } from "@orpc/server";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
+import { createIsomorphicFn } from "@tanstack/react-start";
+import { getHeaders } from "@tanstack/react-start/server";
 import { toast } from "sonner";
-import type { appRouter } from "../../../server/src/lib/orpc/routers/index";
-import type { RouterClient } from "@orpc/server";
+import type { appRouter } from "../../../server/src/orpc/routers";
 
 export const queryClient = new QueryClient({
 	queryCache: new QueryCache({
 		onError: (error) => {
 			toast.error(`Error: ${error.message}`, {
 				action: {
-					label: "retry",
+					label: "Попробовать еще раз",
 					onClick: () => {
 						queryClient.invalidateQueries();
 					},
@@ -21,16 +23,29 @@ export const queryClient = new QueryClient({
 	}),
 });
 
-export const link = new RPCLink({
-	url: `${import.meta.env.VITE_SERVER_URL}/rpc`,
-	fetch(url, options) {
-		return fetch(url, {
-			...options,
-			credentials: "include",
-		});
-	},
-});
+export const getClientLink = createIsomorphicFn()
+	.client(
+		() =>
+			new RPCLink({
+				url: `${import.meta.env.VITE_SERVER_URL}/rpc`,
+				fetch(url, options) {
+					return fetch(url, {
+						...options,
+						credentials: "include",
+					});
+				},
+			}),
+	)
+	.server(
+		() =>
+			new RPCLink({
+				url: `${import.meta.env.VITE_SERVER_URL}/rpc`,
+				headers: () => getHeaders(),
+			}),
+	);
 
-export const client: RouterClient<typeof appRouter> = createORPCClient(link);
+export const client: RouterClient<typeof appRouter> = createORPCClient(
+	getClientLink(),
+);
 
 export const orpc = createTanstackQueryUtils(client);
