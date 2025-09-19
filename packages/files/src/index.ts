@@ -46,8 +46,15 @@ export async function UploadFile({
 		id = f!.id;
 
 		const metadata = s3.file(id);
-		await metadata.write(buf, {
-			type: resolvedMimeType,
+
+		console.log({
+			"uploading image with id": id,
+		});
+
+		console.log({
+			res: await metadata.write(buf, {
+				type: resolvedMimeType,
+			}),
 		});
 	});
 
@@ -61,17 +68,10 @@ export type FileMetadata = {
 	fileSize: number;
 };
 
-export async function GetFile(id: string): Promise<
-	FileMetadata & {
-		s3File: Bun.S3File;
-	}
-> {
+export async function GetFileMetadata(id: string): Promise<FileMetadata> {
 	const cachedMetadata = await redis.get(id);
 	if (cachedMetadata) {
-		return {
-			...(JSON.parse(cachedMetadata) as FileMetadata),
-			s3File: s3.file(id),
-		};
+		return JSON.parse(cachedMetadata) as FileMetadata;
 	}
 
 	const metadata = await db.query.files.findFirst({
@@ -82,10 +82,7 @@ export async function GetFile(id: string): Promise<
 		throw new Error("File not found");
 	}
 
-	await redis.set(id, JSON.stringify(metadata));
+	await redis.set(id, JSON.stringify(metadata), "EX", 24 * 60 * 60);
 
-	return {
-		...metadata,
-		s3File: s3.file(id),
-	};
+	return metadata;
 }

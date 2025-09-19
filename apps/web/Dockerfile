@@ -11,12 +11,15 @@ COPY --from=pruner /app/out/json ./
 COPY --from=pruner /app/out/bun.lock ./bun.lock
 COPY packages ./packages
 COPY apps/server ./apps/server
-RUN bun add react-dom
 RUN bun install
 
 # Builder stage
 FROM oven/bun:latest AS builder
 WORKDIR /app
+ARG VITE_SERVER_URL
+ENV VITE_SERVER_URL=$VITE_SERVER_URL
+ARG VITE_SERVER_URL_INTERNAL
+ENV VITE_SERVER_URL_INTERNAL=$VITE_SERVER_URL_INTERNAL
 COPY --from=installer /app ./
 COPY --from=pruner /app/out/full ./
 RUN bunx turbo run build --filter=web

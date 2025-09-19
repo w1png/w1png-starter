@@ -1,15 +1,23 @@
-import { GetFile } from "@lunarweb/files";
+import { GetFileMetadata, s3 } from "@lunarweb/files";
 import Elysia, { t } from "elysia";
 
 export const fileRouter = new Elysia({ prefix: "/file" }).get(
 	"/:id",
 	async ({ params, set }) => {
-		const file = await GetFile(params.id);
+		const meta = await GetFileMetadata(params.id);
 
-		set.headers["Content-Type"] = file.contentType;
+		set.headers["Content-Type"] = meta.contentType;
 		set.headers["Content-Disposition"] =
-			`attachment; filename="${encodeURIComponent(file.fileName)}"`;
-		return file.s3File.stream();
+			`attachment; filename="${encodeURIComponent(meta.fileName)}"`;
+
+		const s3File = s3.file(meta.id);
+
+		return new Response(s3File.stream(), {
+			headers: {
+				"Content-Type": meta.contentType,
+				"Content-Disposition": `attachment; filename="${encodeURIComponent(meta.fileName)}"`,
+			},
+		});
 	},
 	{
 		params: t.Object({

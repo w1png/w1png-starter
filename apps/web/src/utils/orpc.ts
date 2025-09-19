@@ -11,14 +11,8 @@ import type { appRouter } from "../../../server/src/orpc/routers";
 export const queryClient = new QueryClient({
 	queryCache: new QueryCache({
 		onError: (error) => {
-			toast.error(`Error: ${error.message}`, {
-				action: {
-					label: "Попробовать еще раз",
-					onClick: () => {
-						queryClient.invalidateQueries();
-					},
-				},
-			});
+			toast.error(`Ошибка: ${error.message}`);
+			console.log({ error });
 		},
 	}),
 });
@@ -39,7 +33,7 @@ export const getClientLink = createIsomorphicFn()
 	.server(
 		() =>
 			new RPCLink({
-				url: `${import.meta.env.VITE_SERVER_URL}/rpc`,
+				url: `${import.meta.env.VITE_SERVER_URL_INTERNAL}/rpc`,
 				headers: () => getHeaders(),
 			}),
 	);
