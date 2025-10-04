@@ -10,15 +10,23 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import Loader from "@/components/loader";
 import { Toaster } from "@/components/ui/sonner";
-
+import type { Session } from "@/lib/types/user";
 import type { orpc } from "@/utils/orpc";
 import appCss from "../index.css?url";
 export interface RouterAppContext {
 	orpc: typeof orpc;
 	queryClient: QueryClient;
+	session: Session | null;
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
+	async beforeLoad(ctx) {
+		const session = await ctx.context.orpc.user.session.get.call();
+		console.log({ session, path: ctx.location.href });
+		return {
+			session,
+		};
+	},
 	head: () => ({
 		meta: [
 			{
