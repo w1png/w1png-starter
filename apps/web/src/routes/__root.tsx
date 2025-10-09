@@ -1,5 +1,4 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
 	createRootRouteWithContext,
 	HeadContent,
@@ -7,12 +6,13 @@ import {
 	Scripts,
 	useRouterState,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import Loader from "@/components/loader";
 import { Toaster } from "@/components/ui/sonner";
 import type { Session } from "@/lib/types/user";
 import type { orpc } from "@/utils/orpc";
 import appCss from "../index.css?url";
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 export interface RouterAppContext {
 	orpc: typeof orpc;
 	queryClient: QueryClient;
@@ -22,7 +22,16 @@ export interface RouterAppContext {
 export const Route = createRootRouteWithContext<RouterAppContext>()({
 	async beforeLoad(ctx) {
 		const session = await ctx.context.orpc.user.session.get.call();
-		console.log({ session, path: ctx.location.href });
+		console.log({
+			user: ctx.context.session
+				? {
+						id: ctx.context.session.user.id,
+						name: ctx.context.session.user.name,
+						email: ctx.context.session.user.email,
+					}
+				: undefined,
+			path: ctx.location.href,
+		});
 		return {
 			session,
 		};
@@ -37,7 +46,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 				content: "width=device-width, initial-scale=1",
 			},
 			{
-				title: "My App",
+				title: "app",
 			},
 		],
 		links: [
@@ -52,7 +61,15 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 });
 
 function RootDocument() {
+	const [showLoading, setIsFetching] = useState(false);
 	const isFetching = useRouterState({ select: (s) => s.isLoading });
+
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			setIsFetching(isFetching);
+		}, 200);
+		return () => clearTimeout(timeout);
+	}, [isFetching]);
 
 	return (
 		<html lang="en" className="dark">
@@ -61,11 +78,21 @@ function RootDocument() {
 			</head>
 			<body>
 				<div className="grid h-svh grid-rows-[auto_1fr]">
-					{isFetching ? <Loader /> : <Outlet />}
+					<div
+						className={cn(
+							"fixed text-center h-screen w-screen size-full z-50 backdrop-blur bg-black/10 items-center justify-center flex flex-col gap-4 transition duration-300 ease-in-out",
+							showLoading
+								? "opacity-100 pointer-events-auto"
+								: "opacity-0 pointer-events-none",
+						)}
+					>
+						<div className="text-foreground p-6 rounded-xl flex flex-col gap-4 items-center justify-center">
+							<Loader className="h-9" />
+						</div>
+					</div>
+					<Outlet />
 				</div>
 				<Toaster richColors />
-				<TanStackRouterDevtools position="bottom-left" />
-				<ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
 				<Scripts />
 			</body>
 		</html>

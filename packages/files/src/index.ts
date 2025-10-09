@@ -29,7 +29,7 @@ export async function UploadFile({
 		buf = await sharp(buf).webp().toBuffer();
 	}
 
-	const mimeType = mime.extension(file.name);
+	const mimeType = mime.lookup(file.name);
 	const resolvedMimeType = mimeType ? mimeType : "application/octet-stream";
 
 	let id: string | undefined;
