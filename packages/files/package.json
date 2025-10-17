@@ -24,6 +24,7 @@
 		"@lunarweb/env": "workspace:*",
 		"@lunarweb/redis": "workspace:*",
 		"mime-types": "^3.0.1",
-		"sharp": "^0.34.3"
+		"sharp": "^0.34.3",
+		"drizzle-kit": "catalog:"
 	}
 }

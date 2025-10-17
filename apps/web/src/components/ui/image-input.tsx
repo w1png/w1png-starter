@@ -1,82 +1,166 @@
-import * as React from "react";
-import {
-	Edit,
-	EyeIcon,
-	EyeOffIcon,
-	FileIcon,
-	Paperclip,
-	Upload,
-	UploadIcon,
-	XIcon,
-} from "lucide-react";
+import { UploadIcon, FileIcon, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import { Button } from "./button";
-import Image from "./image";
-import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "./skeleton";
-import { formatBytes } from "@/utils/format";
 
-export interface InputProps
+export interface FileInputProps
 	extends React.InputHTMLAttributes<HTMLInputElement> {
-	className?: string;
-	errors?: (string | undefined)[];
+	fileIds: string[];
+	setFileIds: React.Dispatch<React.SetStateAction<string[]>>;
+	setIsLoading: (isLoading: boolean) => void;
 }
 
-type TFileWithMetadata = {
-	url: string;
+interface UploadedFile {
+	id: string;
 	name: string;
-	sizeBytes: number;
-	contentType: string;
-};
-
-function RemoteFile({ fileId }: { fileId: string }) {
-	const { data: file } = useQuery({
-		queryKey: ["s3-file", fileId],
-		queryFn: async () => {
-			const url = `${import.meta.env.VITE_SERVER_URL}/file/${fileId}`;
-			const res = await fetch(url);
-			const name = res.headers.get("content-disposition")?.split('"')[1];
-			const sizeBytes = res.headers.get("content-length");
-			return {
-				url: fileId,
-				name: name ?? fileId,
-				sizeBytes: sizeBytes ? parseInt(sizeBytes) : 0,
-				contentType: res.headers.get("content-type") ?? "",
-			};
-		},
-	});
-
-	return <FileWithMetadata file={file} />;
+	contentType?: string;
+	size?: number;
 }
 
-function FileWithMetadata({
-	file,
-	onDelete,
-}: {
-	file?: TFileWithMetadata;
-	onDelete?: () => void;
-}) {
-	if (!file) {
-		return <Skeleton className="h-14" />;
+interface UploadingFile {
+	key: string;
+	file: File;
+	progress: number;
+	error?: string;
+}
+
+async function fetchFileMetadata(
+	id: string,
+): Promise<{ name: string; contentType: string; size: number | undefined }> {
+	const response = await fetch(
+		`${import.meta.env.VITE_SERVER_URL}/file/${id}/data`,
+		{
+			method: "GET",
+		},
+	);
+	if (!response.ok) {
+		throw new Error("Failed to fetch metadata");
 	}
 
+	const body: {
+		contentType: string;
+		fileName: string;
+		size: number;
+	} = await response.json();
+
+	return {
+		name: body.fileName,
+		contentType: body.contentType,
+		size: body.size,
+	};
+}
+
+function formatBytes(bytes: number | undefined): string {
+	if (bytes === undefined) return "";
+	if (bytes === 0) return "0 B";
+	const k = 1024;
+	const sizes = ["B", "KB", "MB", "GB", "TB"];
+	const i = Math.floor(Math.log(bytes) / Math.log(k));
+	return `${Number.parseFloat((bytes / k ** i).toFixed(0))} ${sizes[i]}`;
+}
+
+export function FileCard({
+	name,
+	progress,
+	onDelete,
+	isUploading,
+	error,
+	id,
+	file,
+	contentType,
+	size,
+}: {
+	name: string;
+	progress?: number;
+	onDelete?: () => void;
+	isUploading?: boolean;
+	error?: string;
+	id?: string;
+	file?: File;
+	contentType?: string;
+	size?: number;
+}) {
+	const serverUrl = import.meta.env.VITE_SERVER_URL;
 	return (
-		<div className="h-14 px-3 flex items-center justify-between w-full border-2 border-border/10 bg-border/5 rounded-md">
-			<div className="flex gap-2 items-center">
-				{file.contentType.includes("image") ? (
-					<Image src={file.url} nonS3 imageClassName="size-10 rounded-md" />
+		<div className="flex items-center justify-between p-4 border rounded-md">
+			<div className="flex items-center gap-2">
+				{contentType?.startsWith("image/") ? (
+					<img
+						src={
+							isUploading
+								? URL.createObjectURL(file!)
+								: `${serverUrl}/file/${id}`
+						}
+						alt={name}
+						className="size-9 object-cover rounded"
+					/>
 				) : (
-					<div className="bg-border/5 rounded-md p-1 flex items-center justify-center">
-						<FileIcon className="size-6" />
+					<div className="relative">
+						<FileIcon className="size-9 text-muted-foreground" />
+						{name.includes(".") && (
+							<div className="absolute bottom-1.5 bg-[#DB1C47] rounded p-0.5 text-primary-foreground uppercase text-[8px]">
+								{name.split(".").pop()}
+							</div>
+						)}
 					</div>
 				)}
-				<p className="line-clamp-1 max-w-[30ch]">{file.name}</p>
+				<div className="flex flex-col">
+					{!isUploading && !error && id ? (
+						<a
+							href={`${serverUrl}/file/${id}`}
+							download={name}
+							className="cursor-pointer hover:underline hover:text-primary transition"
+						>
+							{name}
+						</a>
+					) : (
+						<p className="text-sm font-medium">{name}</p>
+					)}
+					<div className="flex gap-2 items-center text-xs text-muted-foreground">
+						<p> {size !== undefined ? `${formatBytes(size)}` : ""}</p>
+						{isUploading && !error && progress !== undefined ? (
+							<>
+								<span>•</span>
+								<span className="text-primary">{progress}% Загрузка...</span>
+							</>
+						) : error ? (
+							<>
+								<span>•</span>
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 14 14"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M9.3184 0C9.68967 7.92924e-05 10.0457 0.147631 10.3082 0.4102L13.5898 3.6918C13.8524 3.95429 13.9999 4.31033 14 4.6816V9.3184C13.9999 9.68967 13.8524 10.0457 13.5898 10.3082L10.3082 13.5898C10.0457 13.8524 9.68967 13.9999 9.3184 14H4.6816C4.31033 13.9999 3.95429 13.8524 3.6918 13.5898L0.4102 10.3082C0.147631 10.0457 7.92924e-05 9.68967 0 9.3184V4.6816C7.92924e-05 4.31033 0.147631 3.95429 0.4102 3.6918L3.6918 0.4102C3.95429 0.147631 4.31033 7.92924e-05 4.6816 0H9.3184Z"
+										fill="#DB1C47"
+									/>
+									<path
+										d="M7 9.79995H7.007M7 4.19995V6.99995"
+										stroke="white"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+
+								<span className="text-destructive">{error}</span>
+							</>
+						) : null}
+					</div>
+				</div>
 			</div>
-			<div className="flex gap-2 items-center">
-				<p>{formatBytes(file.sizeBytes)}</p>
+			<div className="flex gap-1 h-full">
 				{onDelete && (
-					<Button size="icon" variant="ghost" onClick={onDelete}>
-						<XIcon />
+					<Button
+						onClick={onDelete}
+						type="button"
+						variant="transparent"
+						size="icon"
+						className="p-0 size-fit cursor-pointer hover:text-muted-foreground"
+					>
+						<X className="size-4" />
 					</Button>
 				)}
 			</div>
@@ -84,61 +168,216 @@ function FileWithMetadata({
 	);
 }
 
-export interface ImageInputProps extends InputProps {
-	images: File[] | undefined;
-	setImages: (img: File[]) => void;
-	s3Images?: string[] | null;
-	recommendedSize?: string;
+function uploadFile(
+	file: File,
+	onProgress: (progress: number) => void,
+): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		const url = `${import.meta.env.VITE_SERVER_URL}/file`;
+
+		xhr.open("POST", url);
+		xhr.setRequestHeader("Accept", "application/json");
+
+		xhr.upload.onprogress = (e) => {
+			if (e.lengthComputable) {
+				onProgress(Math.round((e.loaded / e.total) * 100));
+			}
+		};
+
+		xhr.onload = () => {
+			if (xhr.status >= 200 && xhr.status < 300) {
+				const data = JSON.parse(xhr.responseText);
+				resolve(data.id);
+			} else {
+				reject(new Error(`Ошибка ${xhr.status}`));
+			}
+		};
+
+		xhr.onerror = () => reject(new Error("Ошибка"));
+
+		const formData = new FormData();
+		formData.append("file", file);
+		formData.append(
+			"isImage",
+			file.type.startsWith("image/") ? "true" : "false",
+		);
+
+		xhr.send(formData);
+	});
 }
 
-function FileToFileWithMetadata(file: File): TFileWithMetadata {
-	return {
-		url: URL.createObjectURL(file),
-		name: file.name,
-		sizeBytes: file.size,
-		contentType: file.type,
-	};
-}
+const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
+	({ className, fileIds, setFileIds, setIsLoading, ...props }, ref) => {
+		const [uploadingFiles, setUploadingFiles] = useState<UploadingFile[]>([]);
+		const [isDragging, setIsDragging] = useState(false);
+		const queryClient = useQueryClient();
 
-const FileInput = React.forwardRef<HTMLInputElement, ImageInputProps>(
-	(
-		{ className, recommendedSize, s3Images, images, setImages, ...props },
-		ref,
-	) => {
+		const metadataQueries = useQueries({
+			queries: fileIds.map((id) => ({
+				queryKey: ["fileMetadata", id],
+				queryFn: () => fetchFileMetadata(id),
+				staleTime: Number.POSITIVE_INFINITY,
+			})),
+		});
+
+		const uploadedFiles: UploadedFile[] = fileIds.map((id, index) => {
+			const query = metadataQueries[index];
+			if (query.isSuccess && query.data) {
+				return { id, ...query.data };
+			}
+			return { id, name: "Неизвестный файл" };
+		});
+
+		const uploadMutation = useMutation({
+			mutationFn: ({
+				file,
+				onProgress,
+			}: {
+				file: File;
+				onProgress: (p: number) => void;
+				key: string;
+			}) => uploadFile(file, onProgress),
+			onSuccess: (id, vars) => {
+				setFileIds((prev) => [...prev, id]);
+				queryClient.setQueryData(["fileMetadata", id], {
+					name: vars.file.name,
+					contentType: vars.file.type,
+					size: vars.file.size,
+				});
+				setUploadingFiles((prev) => prev.filter((pu) => pu.key !== vars.key));
+			},
+			onError: (err, vars) => {
+				setUploadingFiles((prev) =>
+					prev.map((pu) =>
+						pu.key === vars.key ? { ...pu, error: "Ошибка" } : pu,
+					),
+				);
+			},
+		});
+
+		useEffect(() => {
+			setIsLoading(uploadingFiles.some((u) => u.error === undefined));
+		}, [uploadingFiles, setIsLoading]);
+
+		const handleFiles = (files: File[]) => {
+			const newUploading = files.map((file) => ({
+				key: `${file.name}-${Date.now()}`,
+				file,
+				progress: 0,
+				error: undefined,
+			}));
+			setUploadingFiles((prev) => [...prev, ...newUploading]);
+
+			newUploading.forEach((u) => {
+				const onProgress = (p: number) =>
+					setUploadingFiles((prev) =>
+						prev.map((pu) => (pu.key === u.key ? { ...pu, progress: p } : pu)),
+					);
+				uploadMutation.mutate({
+					file: u.file,
+					onProgress,
+					key: u.key,
+				});
+			});
+		};
+
+		const handleDelete = (id: string) => {
+			queryClient.removeQueries({ queryKey: ["fileMetadata", id] });
+			setFileIds((prev) => prev.filter((fid) => fid !== id));
+		};
+
+		const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+			const files = Array.from(e.target.files || []);
+			if (files.length > 0) {
+				handleFiles(files);
+				e.target.value = "";
+			}
+		};
+
+		const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+			e.preventDefault();
+			setIsDragging(true);
+		};
+
+		const handleDragEnter = (e: React.DragEvent<HTMLLabelElement>) => {
+			e.preventDefault();
+			setIsDragging(true);
+		};
+
+		const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+			e.preventDefault();
+			setIsDragging(false);
+		};
+
+		const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+			e.preventDefault();
+			setIsDragging(false);
+			const files = Array.from(e.dataTransfer.files);
+			if (files.length > 0) {
+				handleFiles(files);
+			}
+		};
+
 		return (
 			<div className="flex flex-col gap-4 w-full">
-				<label className="cursor-pointer aspect-2/1 flex items-center justify-center w-full rounded-md border-2 border-border/10 hover:border-border/20 group transition-all">
-					<div className="flex flex-col gap-2">
-						<div className="flex items-center gap-2">
-							<UploadIcon />
-							<p>Загрузите нужный файл</p>
+				<label
+					className={`cursor-pointer w-full py-6 flex items-center justify-center w-full rounded-xl border border-dashed bg-secondary group transition-all ${
+						isDragging ? "border-primary bg-secondary/80" : ""
+					}`}
+					onDragEnter={handleDragEnter}
+					onDragOver={handleDragOver}
+					onDragLeave={handleDragLeave}
+					onDrop={handleDrop}
+				>
+					<div className="flex flex-col justify-center items-center gap-1">
+						<UploadIcon />
+						<div className="flex flex-col text-center">
+							<p className="font-medium text-sm">Добавить файлы</p>
+							<p className="text-xs text-muted-foreground">
+								Перетащите его сюда
+							</p>
 						</div>
-						<p className="text-xs text-muted-foreground">{recommendedSize}</p>
 					</div>
 					<input
 						className="hidden"
 						type="file"
-						multiple
-						accept="image/*"
 						ref={ref}
-						onChange={(e) => {
-							if (!e.target.files) return;
-							setImages(Array.from(e.target.files));
-						}}
+						onChange={handleChange}
 						{...props}
 					/>
 				</label>
 				<div className="flex flex-col gap-2 w-full">
-					{images?.length !== 0
-						? images?.map((img, imgIndex) => (
-								<FileWithMetadata
-									key={`${img.name}-${imgIndex}`}
-									file={FileToFileWithMetadata(img)}
-								/>
-							))
-						: s3Images?.length !== 0
-							? s3Images?.map((img) => <RemoteFile key={img} fileId={img} />)
-							: null}
+					{uploadedFiles.map((f) => (
+						<FileCard
+							key={f.id}
+							name={f.name}
+							onDelete={() => handleDelete(f.id)}
+							id={f.id}
+							contentType={f.contentType}
+							size={f.size}
+						/>
+					))}
+					{uploadingFiles.map((u) => (
+						<FileCard
+							key={u.key}
+							name={u.file.name}
+							progress={u.progress}
+							isUploading={true}
+							error={u.error}
+							file={u.file}
+							contentType={u.file.type}
+							size={u.file.size}
+							onDelete={
+								u.error
+									? () =>
+											setUploadingFiles((prev) =>
+												prev.filter((p) => p.key !== u.key),
+											)
+									: undefined
+							}
+						/>
+					))}
 				</div>
 			</div>
 		);
