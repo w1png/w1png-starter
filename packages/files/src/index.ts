@@ -33,29 +33,21 @@ export async function UploadFile({
 	const resolvedMimeType = mimeType ? mimeType : "application/octet-stream";
 
 	let id: string | undefined;
-	await db.transaction(async (trx) => {
-		const [f] = await trx
-			.insert(files)
-			.values({
-				fileName: file.name,
-				fileSize: file.size,
-				contentType: resolvedMimeType,
-			})
-			.returning();
+	const [f] = await db
+		.insert(files)
+		.values({
+			fileName: file.name,
+			fileSize: file.size,
+			contentType: resolvedMimeType,
+		})
+		.returning();
 
-		id = f!.id;
+	id = f!.id;
 
-		const metadata = s3.file(id);
+	const metadata = s3.file(id);
 
-		console.log({
-			"uploading image with id": id,
-		});
-
-		console.log({
-			res: await metadata.write(buf, {
-				type: resolvedMimeType,
-			}),
-		});
+	await metadata.write(buf, {
+		type: resolvedMimeType,
 	});
 
 	return id!;

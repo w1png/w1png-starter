@@ -16,7 +16,11 @@ const handler = new RPCHandler(appRouter, {
 	plugins: [new ResponseHeadersPlugin()],
 });
 
-const app = new Elysia()
+const app = new Elysia({
+	serve: {
+		maxRequestBodySize: Number.MAX_SAFE_INTEGER,
+	},
+})
 	.onError(ApiLogger)
 	// .use(
 	// 	cron({

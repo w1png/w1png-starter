@@ -1,29 +1,31 @@
 {
-  "name": "lunarweb-project",
-  "private": true,
-  "workspaces": {
-    "packages": [
-      "apps/*",
-      "packages/*"
-    ],
-    "catalog": {
-      "drizzle-orm": "^0.44.2",
-      "@types/bun": "1.2.23"
-    }
-  },
-  "scripts": {
-    "check": "biome check --write .",
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "check-types": "turbo check-types",
-    "db:push": "turbo -F @lunarweb/database db:push",
-    "db:studio": "turbo -F @lunarweb/database db:studio",
-    "db:generate": "turbo -F @lunarweb/database db:generate",
-    "db:migrate": "turbo -F @lunarweb/database db:migrate"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.0.0",
-    "turbo": "^2.5.4"
-  },
-  "packageManager": "bun@1.2.17"
+	"name": "lunarweb-project",
+	"private": true,
+	"workspaces": {
+		"packages": [
+			"apps/*",
+			"packages/*"
+		],
+		"catalog": {
+			"drizzle-orm": "^0.44.2",
+			"@orpc/client": "^1.5.0",
+			"@orpc/server": "^1.5.0",
+			"@types/bun": "^1.2.23"
+		}
+	},
+	"scripts": {
+		"check": "biome check --write .",
+		"dev": "turbo dev",
+		"build": "turbo build",
+		"check-types": "turbo check-types",
+		"db:push": "turbo -F @lunarweb/database db:push",
+		"db:studio": "turbo -F @lunarweb/database db:studio",
+		"db:generate": "turbo -F @lunarweb/database db:generate",
+		"db:migrate": "turbo -F @lunarweb/database db:migrate"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.0.0",
+		"turbo": "^2.5.4"
+	},
+	"packageManager": "bun@1.2.17"
 }
