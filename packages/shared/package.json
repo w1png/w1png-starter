@@ -1,24 +1,28 @@
 {
-	"name": "@lunarweb/shared",
-	"module": "src/index.ts",
-	"type": "module",
-	"scripts": {
-		"dev": "tsc --watch",
-		"build": "tsc"
-	},
-	"exports": {
-		"./schemas": {
-			"types": "./src/schemas/index.ts",
-			"default": "./dist/schemas/index.js"
-		}
-	},
-	"devDependencies": {
-		"@types/bun": "latest"
-	},
-	"peerDependencies": {
-		"typescript": "^5"
-	},
-	"dependencies": {
-		"zod": "^4.0.17"
-	}
+  "name": "@lunarweb/shared",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "exports": {
+    "./schemas": {
+      "types": "./src/schemas/index.ts",
+      "default": "./dist/schemas/index.js"
+    },
+    "./declension": {
+      "types": "./src/declension/index.ts",
+      "default": "./dist/declension/index.js"
+    }
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "zod": "^4.0.17"
+  }
 }
