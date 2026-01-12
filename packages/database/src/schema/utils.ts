@@ -1,4 +1,4 @@
-import { pgEnum, serial, timestamp, varchar } from "drizzle-orm/pg-core";
+import { serial, timestamp, varchar } from "drizzle-orm/pg-core";
 
 export const commonFields = {
 	id: varchar("id", { length: 255 })

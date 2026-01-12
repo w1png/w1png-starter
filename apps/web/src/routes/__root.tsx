@@ -22,16 +22,6 @@ export interface RouterAppContext {
 export const Route = createRootRouteWithContext<RouterAppContext>()({
 	async beforeLoad(ctx) {
 		const session = await ctx.context.orpc.user.session.get.call();
-		console.log({
-			user: ctx.context.session
-				? {
-						id: ctx.context.session.user.id,
-						name: ctx.context.session.user.name,
-						email: ctx.context.session.user.email,
-					}
-				: undefined,
-			path: ctx.location.href,
-		});
 		return {
 			session,
 		};

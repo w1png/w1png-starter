@@ -16,11 +16,7 @@ const handler = new RPCHandler(appRouter, {
 	plugins: [new ResponseHeadersPlugin()],
 });
 
-const app = new Elysia({
-	serve: {
-		maxRequestBodySize: Number.MAX_SAFE_INTEGER,
-	},
-})
+const app = new Elysia()
 	.onError(ApiLogger)
 	// .use(
 	// 	cron({
@@ -39,13 +35,8 @@ const app = new Elysia({
 			credentials: true,
 		}),
 	)
-	.all("/api/auth/*", async (context) => {
-		const { request } = context;
-		if (["POST", "GET"].includes(request.method)) {
-			return auth.handler(request);
-		}
-		context.status(405);
-	})
+	.mount(auth.handler)
+	.use(fileRouter)
 	.all("/rpc*", async (context) => {
 		const { response } = await handler.handle(context.request, {
 			prefix: "/rpc",
@@ -53,7 +44,6 @@ const app = new Elysia({
 		});
 		return response ?? new Response("Not Found", { status: 404 });
 	})
-	.use(fileRouter)
 	.listen(3000, () => {
 		console.log("Server is running on http://localhost:3000");
 	});

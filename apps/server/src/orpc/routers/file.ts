@@ -51,14 +51,14 @@ export const fileRouter = new Elysia({ prefix: "/file" })
 			return {
 				id: await UploadFile({
 					file: body.file,
-					isImage: body.isImage === "true",
+					// isImage: body.isImage === "true",
 				}),
 			};
 		},
 		{
 			body: t.Object({
 				file: t.File(),
-				isImage: t.String(),
+				// isImage: t.String(),
 			}),
 		},
 	);
