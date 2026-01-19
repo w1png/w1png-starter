@@ -1,4 +1,4 @@
-services:
+template-services:
   web:
     build:
       context: .
@@ -7,12 +7,12 @@ services:
         VITE_SERVER_URL: ${VITE_SERVER_URL}
         VITE_SERVER_URL_INTERNAL: ${VITE_SERVER_URL_INTERNAL}
     depends_on:
-      - server
+      - template-server
     environment:
       VITE_SERVER_URL: ${VITE_SERVER_URL}
       VITE_SERVER_URL_INTERNAL: ${VITE_SERVER_URL_INTERNAL}
 
-  server:
+  template-server:
     build:
       context: .
       dockerfile: apps/server/Dockerfile
