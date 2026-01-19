@@ -19,6 +19,7 @@ const envSchema = z.object({
 	EMAIL_PASSWORD: z.string(),
 
 	MAIN_ADMIN_EMAIL: z.string().email(),
+	MAIN_ADMIN_PASSWORD: z.string(),
 });
 
 export const env = envSchema.parse(process.env);

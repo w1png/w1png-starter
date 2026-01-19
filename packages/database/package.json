@@ -29,6 +29,7 @@
 	},
 	"dependencies": {
 		"drizzle-orm": "^0.44.2",
-		"@lunarweb/env": "workspace:*"
+		"@lunarweb/env": "workspace:*",
+		"@lunarweb/shared": "workspace:*"
 	}
 }

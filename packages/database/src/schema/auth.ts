@@ -1,3 +1,4 @@
+import type { UserRole } from "@lunarweb/shared/schemas";
 import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -8,6 +9,7 @@ export const user = pgTable("user", {
 	image: text("image"),
 	createdAt: timestamp("created_at").notNull(),
 	updatedAt: timestamp("updated_at").notNull(),
+	role: text("role").notNull().$type<UserRole>().default("USER"),
 });
 
 export const session = pgTable("session", {

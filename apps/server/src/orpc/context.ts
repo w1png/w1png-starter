@@ -1,6 +1,7 @@
 import type { ResponseHeadersPluginContext } from "@orpc/server/plugins";
 import type { Context as ElysiaContext } from "elysia";
 import { auth } from "../auth/auth";
+import type { UserRole } from "@lunarweb/shared/schemas";
 
 export type CreateContextOptions = {
 	context: ElysiaContext;
@@ -11,7 +12,15 @@ export async function createContext({ context }: CreateContextOptions) {
 		headers: context.request.headers,
 	});
 	return {
-		session,
+		session: session
+			? {
+					...session,
+					user: {
+						...session.user,
+						role: session.user.role as UserRole,
+					},
+				}
+			: null,
 	};
 }
 

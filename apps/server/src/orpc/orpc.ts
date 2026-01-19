@@ -1,6 +1,7 @@
 import { ORPCError, os } from "@orpc/server";
 import type { ORPCContext } from "./context";
 import { logger } from "@lunarweb/logger";
+import type { UserRole } from "@lunarweb/shared/schemas";
 
 export const o = os.$context<ORPCContext>();
 
@@ -25,5 +26,20 @@ const requireAuth = o.middleware(async ({ context, next }) => {
 		},
 	});
 });
+
+export const roleProcedure = (roles: UserRole[]) => {
+	return protectedProcedure.use(async ({ context, next, path }) => {
+		if (roles.includes(context.session.user.role)) {
+			throw new ORPCError("FORBIDDEN", {
+				message: `User has role: ${context.session.user.role} but ${roles.join(", ")} are required for ${path.join(".")}`,
+			});
+		}
+		return next({
+			context: {
+				session: context.session,
+			},
+		});
+	});
+};
 
 export const protectedProcedure = publicProcedure.use(requireAuth);
