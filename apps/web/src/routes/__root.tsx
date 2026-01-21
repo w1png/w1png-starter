@@ -36,14 +36,37 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 				content: "width=device-width, initial-scale=1",
 			},
 			{
-				title: "app",
+				title: "App",
 			},
+			{
+				name: "description",
+				content: "Description",
+			},
+			{
+				name: "og:title",
+				content: "App",
+			},
+			{
+				name: "og:description",
+				content: "Description",
+			},
+			{
+				name: "og:type",
+				content: "website",
+			},
+			{
+				name: "og:url",
+				content: import.meta.env.VITE_FRONTEND_URL,
+			},
+			{ name: "robots", content: "index, follow" },
 		],
 		links: [
 			{
 				rel: "stylesheet",
 				href: appCss,
 			},
+			{ rel: "icon", href: "/favicon.png", type: "image/png", sizes: "32x32" },
+			{ rel: "canonical", href: import.meta.env.VITE_FRONTEND_URL },
 		],
 	}),
 
