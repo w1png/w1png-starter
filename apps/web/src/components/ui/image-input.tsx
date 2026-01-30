@@ -6,7 +6,7 @@ import { Button } from "./button";
 export interface FileInputProps
 	extends React.InputHTMLAttributes<HTMLInputElement> {
 	fileIds: string[];
-	setFileIds: React.Dispatch<React.SetStateAction<string[]>>;
+	setFileIds: (fileIds: string[]) => void;
 	setIsLoading: (isLoading: boolean) => void;
 }
 
@@ -29,20 +29,16 @@ async function fetchFileMetadata(
 ): Promise<{ name: string; contentType: string; size: number | undefined }> {
 	const response = await fetch(
 		`${import.meta.env.VITE_SERVER_URL}/file/${id}/data`,
-		{
-			method: "GET",
-		},
+		{ method: "GET" },
 	);
 	if (!response.ok) {
 		throw new Error("Failed to fetch metadata");
 	}
-
 	const body: {
 		contentType: string;
 		fileName: string;
 		size: number;
 	} = await response.json();
-
 	return {
 		name: body.fileName,
 		contentType: body.contentType,
@@ -81,6 +77,7 @@ export function FileCard({
 	size?: number;
 }) {
 	const serverUrl = import.meta.env.VITE_SERVER_URL;
+
 	return (
 		<div className="flex items-center justify-between p-4 border rounded-md">
 			<div className="flex items-center gap-2">
@@ -104,6 +101,7 @@ export function FileCard({
 						)}
 					</div>
 				)}
+
 				<div className="flex flex-col">
 					{!isUploading && !error && id ? (
 						<a
@@ -116,8 +114,10 @@ export function FileCard({
 					) : (
 						<p className="text-sm font-medium">{name}</p>
 					)}
+
 					<div className="flex gap-2 items-center text-xs text-muted-foreground">
-						<p> {size !== undefined ? `${formatBytes(size)}` : ""}</p>
+						<p>{size !== undefined ? `${formatBytes(size)}` : ""}</p>
+
 						{isUploading && !error && progress !== undefined ? (
 							<>
 								<span>•</span>
@@ -140,17 +140,17 @@ export function FileCard({
 									<path
 										d="M7 9.79995H7.007M7 4.19995V6.99995"
 										stroke="white"
-										stroke-linecap="round"
-										stroke-linejoin="round"
+										strokeLinecap="round"
+										strokeLinejoin="round"
 									/>
 								</svg>
-
 								<span className="text-destructive">{error}</span>
 							</>
 						) : null}
 					</div>
 				</div>
 			</div>
+
 			<div className="flex gap-1 h-full">
 				{onDelete && (
 					<Button
@@ -175,7 +175,6 @@ function uploadFile(
 	return new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest();
 		const url = `${import.meta.env.VITE_SERVER_URL}/file`;
-
 		xhr.open("POST", url);
 		xhr.setRequestHeader("Accept", "application/json");
 
@@ -202,7 +201,6 @@ function uploadFile(
 			"isImage",
 			file.type.startsWith("image/") ? "true" : "false",
 		);
-
 		xhr.send(formData);
 	});
 }
@@ -233,25 +231,28 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 			mutationFn: ({
 				file,
 				onProgress,
+				key,
 			}: {
 				file: File;
 				onProgress: (p: number) => void;
 				key: string;
 			}) => uploadFile(file, onProgress),
-			onSuccess: (id, vars) => {
-				setFileIds((prev) => [...prev, id]);
+
+			onSuccess: (id, { file, key }) => {
+				setFileIds([...fileIds, id]);
+
 				queryClient.setQueryData(["fileMetadata", id], {
-					name: vars.file.name,
-					contentType: vars.file.type,
-					size: vars.file.size,
+					name: file.name,
+					contentType: file.type,
+					size: file.size,
 				});
-				setUploadingFiles((prev) => prev.filter((pu) => pu.key !== vars.key));
+
+				setUploadingFiles((files) => files.filter((f) => f.key !== key));
 			},
-			onError: (err, vars) => {
-				setUploadingFiles((prev) =>
-					prev.map((pu) =>
-						pu.key === vars.key ? { ...pu, error: "Ошибка" } : pu,
-					),
+
+			onError: (_, { key }) => {
+				setUploadingFiles((files) =>
+					files.map((f) => (f.key === key ? { ...f, error: "Ошибка" } : f)),
 				);
 			},
 		});
@@ -267,13 +268,15 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 				progress: 0,
 				error: undefined,
 			}));
-			setUploadingFiles((prev) => [...prev, ...newUploading]);
+
+			setUploadingFiles([...uploadingFiles, ...newUploading]);
 
 			newUploading.forEach((u) => {
 				const onProgress = (p: number) =>
-					setUploadingFiles((prev) =>
-						prev.map((pu) => (pu.key === u.key ? { ...pu, progress: p } : pu)),
+					setUploadingFiles((current) =>
+						current.map((f) => (f.key === u.key ? { ...f, progress: p } : f)),
 					);
+
 				uploadMutation.mutate({
 					file: u.file,
 					onProgress,
@@ -282,32 +285,21 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 			});
 		};
 
-		const handleDelete = (id: string) => {
+		const handleDeleteUploaded = (id: string) => {
 			queryClient.removeQueries({ queryKey: ["fileMetadata", id] });
-			setFileIds((prev) => prev.filter((fid) => fid !== id));
+			setFileIds(fileIds.filter((fid) => fid !== id));
+		};
+
+		const handleDeleteUploading = (key: string) => {
+			setUploadingFiles(uploadingFiles.filter((f) => f.key !== key));
 		};
 
 		const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 			const files = Array.from(e.target.files || []);
 			if (files.length > 0) {
 				handleFiles(files);
-				e.target.value = "";
 			}
-		};
-
-		const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
-			e.preventDefault();
-			setIsDragging(true);
-		};
-
-		const handleDragEnter = (e: React.DragEvent<HTMLLabelElement>) => {
-			e.preventDefault();
-			setIsDragging(true);
-		};
-
-		const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
-			e.preventDefault();
-			setIsDragging(false);
+			e.target.value = "";
 		};
 
 		const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
@@ -322,12 +314,21 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 		return (
 			<div className="flex flex-col gap-4 w-full">
 				<label
-					className={`cursor-pointer w-full py-6 flex items-center justify-center w-full rounded-xl border border-dashed bg-secondary group transition-all ${
+					className={`cursor-pointer w-full py-6 flex items-center justify-center rounded-xl border border-dashed bg-secondary group transition-all ${
 						isDragging ? "border-primary bg-secondary/80" : ""
 					}`}
-					onDragEnter={handleDragEnter}
-					onDragOver={handleDragOver}
-					onDragLeave={handleDragLeave}
+					onDragEnter={(e) => {
+						e.preventDefault();
+						setIsDragging(true);
+					}}
+					onDragOver={(e) => {
+						e.preventDefault();
+						setIsDragging(true);
+					}}
+					onDragLeave={(e) => {
+						e.preventDefault();
+						setIsDragging(false);
+					}}
 					onDrop={handleDrop}
 				>
 					<div className="flex flex-col justify-center items-center gap-1">
@@ -339,6 +340,7 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 							</p>
 						</div>
 					</div>
+
 					<input
 						className="hidden"
 						type="file"
@@ -347,17 +349,19 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 						{...props}
 					/>
 				</label>
+
 				<div className="flex flex-col gap-2 w-full">
 					{uploadedFiles.map((f) => (
 						<FileCard
 							key={f.id}
 							name={f.name}
-							onDelete={() => handleDelete(f.id)}
+							onDelete={() => handleDeleteUploaded(f.id)}
 							id={f.id}
 							contentType={f.contentType}
 							size={f.size}
 						/>
 					))}
+
 					{uploadingFiles.map((u) => (
 						<FileCard
 							key={u.key}
@@ -369,12 +373,7 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 							contentType={u.file.type}
 							size={u.file.size}
 							onDelete={
-								u.error
-									? () =>
-											setUploadingFiles((prev) =>
-												prev.filter((p) => p.key !== u.key),
-											)
-									: undefined
+								u.error ? () => handleDeleteUploading(u.key) : undefined
 							}
 						/>
 					))}
@@ -383,6 +382,7 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 		);
 	},
 );
+
 FileInput.displayName = "FileInput";
 
 export { FileInput };
