@@ -8,8 +8,14 @@ export const Route = createFileRoute("/auth/sign-out")({
 });
 
 function SignOutPage() {
+	const navigate = Route.useNavigate();
+
 	useEffect(() => {
-		authClient.signOut();
+		authClient.signOut().then(() =>
+			navigate({
+				to: "/auth/sign-in",
+			}),
+		);
 	}, []);
 
 	return <Loader />;
