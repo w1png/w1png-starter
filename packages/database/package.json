@@ -30,7 +30,7 @@
 		"typescript": "^5"
 	},
 	"dependencies": {
-		"drizzle-orm": "^0.44.2",
+		"drizzle-orm": "catalog:",
 		"@lunarweb/env": "workspace:*",
 		"@lunarweb/shared": "workspace:*"
 	}
