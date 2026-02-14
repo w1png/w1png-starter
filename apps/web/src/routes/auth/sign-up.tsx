@@ -46,9 +46,11 @@ function SignUpPage() {
 		},
 		validators: {
 			onSubmit: z.object({
-				name: z.string().min(2, "Name must be at least 2 characters"),
-				email: z.email("Invalid email address"),
-				password: z.string().min(8, "Password must be at least 8 characters"),
+				name: z.string().min(2, "Введите ваше имя"),
+				email: z.email("Введите ваш Email"),
+				password: z.string({
+          message: "Введите пароль"
+        }).min(8, "Пароль должен быть не менее 8 символов"),
 			}),
 		},
 	});
