@@ -11,14 +11,10 @@ export default function ErrorComponent({
 	console.error(error);
 
 	return (
-		<div className="fixed w-screen h-screen inset-0 z-50">
+		<div className="fixed w-screen backdrop-blur h-screen inset-0 z-50">
 			<div className="h-screen size-full relative flex items-center justify-center">
-				<div className="mx-auto w-full flex flex-col gap-6 mt-10 max-w-md p-6 z-10 bg-sidebar rounded-xl text-sidebar-foreground shadow-md">
+				<div className="mx-auto w-full flex flex-col gap-6 mt-10 max-w-md p-6 z-10 bg-white rounded-xl text-sidebar-foreground shadow-md">
 					<div className="flex flex-col gap-4 items-center justify-center">
-						{/*
-						<Logo className="w-16" />
-            */}
-
 						<div className="flex flex-col text-center gap-1 max-w-[30ch] select-none">
 							<p className="text-2xl">Ошибка</p>
 							<p className="text-muted-foreground text-sm">
