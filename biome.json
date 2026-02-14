@@ -29,7 +29,7 @@
 		"actions": {
 			"source": {
 				"organizeImports": "off",
-        "useSortedAttributes": "on"
+        "useSortedAttributes": "off"
 			}
 		}
 	},

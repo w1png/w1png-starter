@@ -11,11 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.xml]'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
+import { Route as LandingRouteRouteImport } from './routes/_landing/route'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as LandingIndexRouteImport } from './routes/_landing/index'
 import { Route as AuthSignUpRouteImport } from './routes/auth/sign-up'
 import { Route as AuthSignOutRouteImport } from './routes/auth/sign-out'
 import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
+import { Route as LandingPolicyIndexRouteImport } from './routes/_landing/policy/index'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -27,15 +29,19 @@ const AdminRouteRoute = AdminRouteRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LandingRouteRoute = LandingRouteRouteImport.update({
+  id: '/_landing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const LandingIndexRoute = LandingIndexRouteImport.update({
-  id: '/_landing/',
+  id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => LandingRouteRoute,
 } as any)
 const AuthSignUpRoute = AuthSignUpRouteImport.update({
   id: '/auth/sign-up',
@@ -52,15 +58,21 @@ const AuthSignInRoute = AuthSignInRouteImport.update({
   path: '/auth/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LandingPolicyIndexRoute = LandingPolicyIndexRouteImport.update({
+  id: '/policy/',
+  path: '/policy/',
+  getParentRoute: () => LandingRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof LandingIndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-out': typeof AuthSignOutRoute
   '/auth/sign-up': typeof AuthSignUpRoute
-  '/': typeof LandingIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/policy/': typeof LandingPolicyIndexRoute
 }
 export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -69,9 +81,11 @@ export interface FileRoutesByTo {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/': typeof LandingIndexRoute
   '/admin': typeof AdminIndexRoute
+  '/policy': typeof LandingPolicyIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_landing': typeof LandingRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/auth/sign-in': typeof AuthSignInRoute
@@ -79,17 +93,19 @@ export interface FileRoutesById {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/_landing/': typeof LandingIndexRoute
   '/admin/': typeof AdminIndexRoute
+  '/_landing/policy/': typeof LandingPolicyIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/admin'
     | '/sitemap.xml'
     | '/auth/sign-in'
     | '/auth/sign-out'
     | '/auth/sign-up'
-    | '/'
     | '/admin/'
+    | '/policy/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/sitemap.xml'
@@ -98,8 +114,10 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/'
     | '/admin'
+    | '/policy'
   id:
     | '__root__'
+    | '/_landing'
     | '/admin'
     | '/sitemap.xml'
     | '/auth/sign-in'
@@ -107,15 +125,16 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/_landing/'
     | '/admin/'
+    | '/_landing/policy/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  LandingRouteRoute: typeof LandingRouteRouteWithChildren
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AuthSignInRoute: typeof AuthSignInRoute
   AuthSignOutRoute: typeof AuthSignOutRoute
   AuthSignUpRoute: typeof AuthSignUpRoute
-  LandingIndexRoute: typeof LandingIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -134,6 +153,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_landing': {
+      id: '/_landing'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof LandingRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -146,7 +172,7 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof LandingIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof LandingRouteRoute
     }
     '/auth/sign-up': {
       id: '/auth/sign-up'
@@ -169,8 +195,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignInRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_landing/policy/': {
+      id: '/_landing/policy/'
+      path: '/policy'
+      fullPath: '/policy/'
+      preLoaderRoute: typeof LandingPolicyIndexRouteImport
+      parentRoute: typeof LandingRouteRoute
+    }
   }
 }
+
+interface LandingRouteRouteChildren {
+  LandingIndexRoute: typeof LandingIndexRoute
+  LandingPolicyIndexRoute: typeof LandingPolicyIndexRoute
+}
+
+const LandingRouteRouteChildren: LandingRouteRouteChildren = {
+  LandingIndexRoute: LandingIndexRoute,
+  LandingPolicyIndexRoute: LandingPolicyIndexRoute,
+}
+
+const LandingRouteRouteWithChildren = LandingRouteRoute._addFileChildren(
+  LandingRouteRouteChildren,
+)
 
 interface AdminRouteRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
@@ -185,12 +232,12 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  LandingRouteRoute: LandingRouteRouteWithChildren,
   AdminRouteRoute: AdminRouteRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AuthSignInRoute: AuthSignInRoute,
   AuthSignOutRoute: AuthSignOutRoute,
   AuthSignUpRoute: AuthSignUpRoute,
-  LandingIndexRoute: LandingIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
