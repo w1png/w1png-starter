@@ -7,14 +7,14 @@
 			"inputs": ["$TURBO_DEFAULT$", ".env*"],
 			"outputs": ["dist/**"]
 		},
-		"lint": {
-			"dependsOn": ["^lint"]
+		"check:types": {
+			"dependsOn": ["^check:types"]
 		},
-		"check-types": {
-			"dependsOn": ["^check-types"]
-		},
-		"dev": {
-			"cache": false,
+    "check:lint": {
+      "dependsOn": ["^check:lint"]
+    },
+  "dev": {
+    "cache": false,
 			"persistent": true
 		},
 		"db:push": {
@@ -30,6 +30,10 @@
 			"persistent": true
 		},
 		"db:generate": {
+			"cache": false,
+			"persistent": true
+		},
+    "tg:webhook": {
 			"cache": false,
 			"persistent": true
 		}

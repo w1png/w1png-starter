@@ -10,7 +10,7 @@ import { ApiLogger } from "./api-logger";
 import { env } from "@lunarweb/env";
 import { auth } from "./auth/auth";
 import { createContext } from "./orpc/context";
-import { fileRouter } from "./orpc/routers/file";
+import { fileRouter } from "@lunarweb/files";
 
 const handler = new RPCHandler(appRouter, {
 	plugins: [new ResponseHeadersPlugin()],
@@ -29,7 +29,7 @@ const app = new Elysia()
 	// )
 	.use(
 		cors({
-			origin: env.CORS_ORIGIN || "",
+			origin: env.FRONTEND_URL || "",
 			methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
 			allowedHeaders: ["Content-Type", "Authorization"],
 			credentials: true,

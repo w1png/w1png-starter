@@ -4,13 +4,10 @@ import { Button } from "./button";
 import { cn } from "@/lib/utils";
 
 export interface InputProps
-	extends React.InputHTMLAttributes<HTMLInputElement>,
-		React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+	extends React.InputHTMLAttributes<HTMLInputElement> {
 	className?: string;
-	prefix?: React.ReactNode;
-	postfix?: React.ReactNode;
 	errors?: (string | undefined)[];
-	size?: "default" | "textarea";
+	variant?: "default" | "textarea";
 }
 
 const Input = React.forwardRef<
@@ -18,26 +15,15 @@ const Input = React.forwardRef<
 	InputProps
 >(
 	(
-		{
-			className,
-			errors,
-			size = "default",
-			prefix,
-			postfix,
-			placeholder,
-			type,
-			...props
-		},
+		{ className, errors, variant = "default", placeholder, type, ...props },
 		ref,
 	) => {
 		const hasErrors = errors && errors.length > 0;
 
 		const inputClassName = cn(
 			"flex transition-all duration-300 w-full text-base resize-none px-3 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:outline-hidden focus-visible:ring-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-			prefix ? "pl-8" : "",
-			postfix ? "pr-8" : "",
 			placeholder && props.value ? "h-10 mt-4" : "h-14",
-			size === "textarea" ? "h-[calc(100%-44px)] py-2 min-h-[120px]" : "",
+			variant === "textarea" ? "h-[calc(100%-44px)] py-2 min-h-[120px]" : "",
 		);
 
 		return (
@@ -48,30 +34,19 @@ const Input = React.forwardRef<
 						hasErrors
 							? "border-destructive/80 hover:border-destructive"
 							: "border-input/10 hover:border-input/30",
-						size === "textarea" ? "h-fit min-h-[120px]" : "",
+						variant === "textarea" ? "h-fit min-h-[120px]" : "",
 					)}
 				>
-					{prefix && (
-						<div className="absolute px-3 h-14 flex items-center justify-center left-0">
-							{prefix}
-						</div>
-					)}
-					{postfix && (
-						<div className="absolute px-3 h-14 flex items-center justify-center right-0">
-							{postfix}
-						</div>
-					)}
 					<div
 						className={cn(
-							"pointer-events-none absolute transition-all duration-300 text-xs text-muted-foreground top-1",
-							prefix ? "left-8" : "left-3",
+							"pointer-events-none absolute transition-all duration-300 text-xs text-muted-foreground top-1 left-3",
 							placeholder && props.value ? "" : "opacity-0 blur-sm scale-80",
 						)}
 					>
 						{placeholder}
 					</div>
 
-					{size === "default" ? (
+					{variant === "default" ? (
 						<input
 							type={type}
 							className={inputClassName}
@@ -80,6 +55,7 @@ const Input = React.forwardRef<
 							{...props}
 						/>
 					) : (
+						// @ts-ignore
 						<textarea
 							className={cn(inputClassName)}
 							placeholder={placeholder}

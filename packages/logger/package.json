@@ -4,6 +4,8 @@
 	"type": "module",
 	"scripts": {
 		"dev": "tsc --watch",
+		"check:types": "tsc --noEmit",
+    "check:lint": "biome check",
 		"build": "tsc"
 	},
 	"exports": {
@@ -20,6 +22,6 @@
 	},
 	"dependencies": {
 		"winston": "^3.17.0",
-		"zod": "^4.0.17"
+		"zod": "catalog:"
 	}
 }

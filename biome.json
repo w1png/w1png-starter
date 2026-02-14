@@ -28,7 +28,7 @@
 	"assist": {
 		"actions": {
 			"source": {
-				"organizeImports": "on"
+				"organizeImports": "off"
 			}
 		}
 	},
@@ -39,6 +39,9 @@
 			"correctness": {
 				"useExhaustiveDependencies": "info"
 			},
+      "a11y":{ 
+        "noSvgWithoutTitle": "off"
+      },
 			"style": {
 				"noParameterAssign": "error",
 				"useAsConstAssertion": "error",

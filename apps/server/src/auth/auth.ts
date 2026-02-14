@@ -22,14 +22,14 @@ export const auth = betterAuth({
 			},
 		},
 	},
-	trustedOrigins: [process.env.CORS_ORIGIN || ""],
+	trustedOrigins: [process.env.FRONTEND_URL || ""],
 	emailAndPassword: {
 		enabled: true,
 		disableSignUp: !allowSignUp(),
 	},
 	secret: process.env.BETTER_AUTH_SECRET,
-	baseURL: process.env.BETTER_AUTH_URL,
-	advanced: env.CORS_ORIGIN.includes("localhost")
+	baseURL: process.env.BACKEND_URL,
+	advanced: env.FRONTEND_URL.includes("localhost")
 		? undefined
 		: {
 				defaultCookieAttributes: {

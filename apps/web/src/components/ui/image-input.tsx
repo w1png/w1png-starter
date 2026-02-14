@@ -36,11 +36,11 @@ async function fetchFileMetadata(
 	}
 	const body: {
 		contentType: string;
-		fileName: string;
+		name: string;
 		size: number;
 	} = await response.json();
 	return {
-		name: body.fileName,
+		name: body.name,
 		contentType: body.contentType,
 		size: body.size,
 	};
@@ -231,7 +231,6 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 			mutationFn: ({
 				file,
 				onProgress,
-				key,
 			}: {
 				file: File;
 				onProgress: (p: number) => void;

@@ -4,37 +4,33 @@
 	"type": "module",
 	"scripts": {
 		"build": "tsc && tsc-alias",
-		"check-types": "tsc --noEmit",
+		"check:types": "tsc --noEmit",
+    "check:lint": "biome check",
 		"compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
 		"dev": "bun run --hot src/index.ts",
 		"start": "bun run dist/src/index.js"
 	},
 	"dependencies": {
-		"@elysiajs/cors": "^1.2.0",
-		"@orpc/client": "catalog:",
-		"@orpc/server": "catalog:",
-		"better-auth": "^1.2.10",
-		"dotenv": "^16.4.7",
-		"drizzle-orm": "^0.44.2",
-		"elysia": "^1.2.25",
-		"mime-types": "^3.0.1",
-		"pg": "^8.14.1",
-		"sharp": "^0.34.2",
-		"zod": "^3.25.16",
-		"@lunarweb/shared": "workspace:*",
+		"@elysiajs/cors": "^1.4.1",
+		"@lunarweb/database": "workspace:*",
 		"@lunarweb/env": "workspace:*",
-		"@lunarweb/email": "workspace:*",
+		"@lunarweb/files": "workspace:*",
 		"@lunarweb/logger": "workspace:*",
 		"@lunarweb/redis": "workspace:*",
-		"@lunarweb/files": "workspace:*",
-		"@lunarweb/database": "workspace:*"
+		"@lunarweb/shared": "workspace:*",
+		"@orpc/client": "catalog:",
+		"@orpc/server": "catalog:",
+		"better-auth": "^1.4.18",
+		"dotenv": "^16.4.7",
+		"drizzle-orm": "catalog:",
+		"elysia": "catalog:",
+		"mime-types": "^3.0.1",
+		"zod": "catalog:"
 	},
 	"devDependencies": {
 		"@types/bun": "catalog:",
 		"@types/mime-types": "^3.0.1",
-		"@types/pg": "^8.11.11",
-		"drizzle-kit": "^0.31.2",
 		"tsc-alias": "^1.8.11",
-		"typescript": "^5.8.2"
+		"typescript": "^5.9.3"
 	}
 }

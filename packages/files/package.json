@@ -4,6 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsc --watch",
+		"check:types": "tsc --noEmit",
+    "check:lint": "biome check",
     "build": "tsc"
   },
   "exports": {
@@ -23,7 +25,9 @@
     "@lunarweb/database": "workspace:*",
     "@lunarweb/env": "workspace:*",
     "@lunarweb/redis": "workspace:*",
+    "drizzle-orm": "catalog:",
+    "elysia": "catalog:",
     "mime-types": "^3.0.1",
-    "sharp": "^0.34.3"
+    "sharp": "^0.34.5"
   }
 }

@@ -1,35 +1,29 @@
 {
-	"name": "@lunarweb/email",
+	"name": "@lunarweb/telegram",
 	"module": "src/index.ts",
 	"type": "module",
 	"scripts": {
 		"dev": "tsc --watch",
+		"build": "tsc",
 		"check:types": "tsc --noEmit",
     "check:lint": "biome check",
-		"build": "tsc"
+		"tg:webhook": "bun run src/webhook.ts"
 	},
 	"exports": {
 		".": {
 			"types": "./src/index.ts",
 			"default": "./dist/index.js"
-		},
-		"./templates": {
-			"types": "./src/templates",
-			"default": "./dist/templates"
 		}
 	},
 	"devDependencies": {
-		"@types/bun": "latest",
-		"@types/nodemailer": "^7.0.0",
-		"react-email": "^4.2.8"
+		"@types/bun": "latest"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
 	},
 	"dependencies": {
 		"@lunarweb/env": "workspace:*",
-		"@lunarweb/logger": "workspace:*",
-		"@react-email/components": "^0.5.0",
-		"nodemailer": "^7.0.5"
+		"@telegram-apps/init-data-node": "^2.0.10",
+		"grammy": "^1.40.0"
 	}
 }

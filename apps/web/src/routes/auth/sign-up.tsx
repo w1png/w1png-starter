@@ -34,9 +34,9 @@ function SignUpPage() {
 				{
 					onSuccess: () => {
 						navigate({
-							to: "/dashboard",
+							to: "/",
 						});
-						toast.success("Sign up successful");
+						toast.success("Вы успешно зарегистрировались");
 					},
 					onError: (error) => {
 						toast.error(error.error.message);

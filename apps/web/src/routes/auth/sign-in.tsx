@@ -32,9 +32,9 @@ function SignInPage() {
 				{
 					onSuccess: () => {
 						navigate({
-							to: "/dashboard",
+							to: "/admin",
 						});
-						toast.success("Sign in successful");
+						toast.success("Вы успешно вошли в аккаунт");
 					},
 					onError: (error) => {
 						toast.error(error.error.message);
@@ -56,7 +56,7 @@ function SignInPage() {
 
 	return (
 		<div className="mx-auto w-full mt-10 max-w-md p-6">
-			<h1 className="mb-6 text-center text-3xl font-bold">Welcome Back</h1>
+			<h1 className="mb-6 text-center text-3xl font-bold">Авторизация</h1>
 
 			<form
 				onSubmit={(e) => {
@@ -93,7 +93,7 @@ function SignInPage() {
 					<form.Field name="password">
 						{(field) => (
 							<div className="space-y-2">
-								<Label htmlFor={field.name}>Password</Label>
+								<Label htmlFor={field.name}>Пароль</Label>
 								<Input
 									id={field.name}
 									name={field.name}

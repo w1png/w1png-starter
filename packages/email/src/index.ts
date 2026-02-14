@@ -1,4 +1,3 @@
-import { env } from "@lunarweb/env";
 import { logger } from "@lunarweb/logger";
 import { render } from "@react-email/render";
 import nodemailer from "nodemailer";
@@ -8,15 +7,16 @@ export class Email {
 	private transporter: nodemailer.Transporter;
 
 	constructor() {
-		this.transporter = nodemailer.createTransport({
-			host: env.EMAIL_HOST,
-			port: env.EMAIL_PORT,
-			secure: true,
-			auth: {
-				user: env.EMAIL_USER,
-				pass: env.EMAIL_PASSWORD,
-			},
-		});
+		this.transporter = nodemailer.createTransport();
+		// {
+		// 			host: process.env.EMAIL_HOST,
+		// 			port: process.env.EMAIL_PORT,
+		// 			secure: true,
+		// 			auth: {
+		// 				user: process.env.EMAIL_USER,
+		// 				pass: process.env.EMAIL_PASSWORD,
+		// 			},
+		// 		}
 	}
 
 	async send({
@@ -30,7 +30,7 @@ export class Email {
 	}) {
 		try {
 			this.transporter.sendMail({
-				from: env.EMAIL_USER,
+				from: process.env.EMAIL_USER,
 				to,
 				subject: subject,
 				html: await render(body),

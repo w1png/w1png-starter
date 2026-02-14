@@ -6,7 +6,8 @@ import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { toast } from "sonner";
-import type { appRouter } from "../../../server/src/orpc/routers";
+// @ts-ignore
+import type { AppRouter } from "../../../server/src/orpc/routers";
 
 export const queryClient = new QueryClient({
 	queryCache: new QueryCache({
@@ -41,7 +42,7 @@ export const getClientLink = createIsomorphicFn()
 			new RPCLink({
 				url: `${import.meta.env.VITE_SERVER_URL_INTERNAL}/rpc`,
 				headers: () => {
-					return getRequest().headers.toJSON();
+					return getRequest().headers;
 				},
 				fetch(url, options) {
 					try {
@@ -57,7 +58,7 @@ export const getClientLink = createIsomorphicFn()
 			}),
 	);
 
-export const client: RouterClient<typeof appRouter> = createORPCClient(
+export const client: RouterClient<AppRouter> = createORPCClient(
 	getClientLink(),
 );
 

@@ -1,7 +1,7 @@
 import { db } from "@lunarweb/database";
 import { files } from "@lunarweb/database/schema";
 import { env } from "@lunarweb/env";
-import { redis } from "@lunarweb/redis";
+import { DEFAULT_TTL, ServeCached } from "@lunarweb/redis";
 import { eq } from "drizzle-orm";
 import mime from "mime-types";
 
@@ -14,66 +14,42 @@ export const s3 = new Bun.S3Client({
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-export async function UploadFile({
-	file,
-	// isImage,
-}: {
-	file: File;
-	// isImage: boolean;
-}) {
-	const arrayBuffer = await file.arrayBuffer();
-	let buf: Buffer<ArrayBufferLike> = Buffer.from(arrayBuffer);
-
-	// if (isImage) {
-	// 	buf = await sharp(buf).webp().toBuffer();
-	// }
-
+export async function UploadFile({ file }: { file: File }) {
 	const mimeType = mime.lookup(file.name);
 	const resolvedMimeType = mimeType ? mimeType : "application/octet-stream";
 
-	let id: string | undefined;
 	const [f] = await db
 		.insert(files)
 		.values({
-			fileName: file.name,
-			fileSize: file.size,
+			name: file.name,
+			size: file.size,
 			contentType: resolvedMimeType,
 		})
-		.returning();
+		.returning({ id: files.id });
 
-	id = f!.id;
+	const id = f!.id;
 
 	const metadata = s3.file(id);
 
-	await metadata.write(buf, {
+	await metadata.write(Buffer.from(await file.arrayBuffer()), {
 		type: resolvedMimeType,
 	});
 
-	return id!;
+	return id;
 }
 
-export type FileMetadata = {
-	id: string;
-	fileName: string;
-	contentType: string;
-	fileSize: number;
-};
+export async function GetFileMetadata(id: string) {
+	const meta = await ServeCached(["file", id], DEFAULT_TTL, async () =>
+		db.query.files.findFirst({
+			where: eq(files.id, id),
+		}),
+	);
 
-export async function GetFileMetadata(id: string): Promise<FileMetadata> {
-	const cachedMetadata = await redis.get(id);
-	if (cachedMetadata) {
-		return JSON.parse(cachedMetadata) as FileMetadata;
-	}
-
-	const metadata = await db.query.files.findFirst({
-		where: eq(files.id, id),
-	});
-
-	if (!metadata) {
+	if (!meta) {
 		throw new Error("File not found");
 	}
 
-	await redis.set(id, JSON.stringify(metadata), "EX", 24 * 60 * 60);
-
-	return metadata;
+	return meta;
 }
+
+export * from "./router";
