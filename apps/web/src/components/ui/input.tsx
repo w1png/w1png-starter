@@ -34,7 +34,7 @@ const Input = React.forwardRef<
 						hasErrors
 							? "border-destructive/80 hover:border-destructive"
 							: "border-input/10 hover:border-input/30",
-						variant === "textarea" ? "h-fit min-h-[120px]" : "",
+						variant === "textarea" ? "h-fit min-h-30" : "",
 					)}
 				>
 					<div

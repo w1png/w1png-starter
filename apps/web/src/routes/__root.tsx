@@ -11,7 +11,7 @@ import Loader from "@/components/loader";
 import { Toaster } from "@/components/ui/sonner";
 import type { Session } from "@/lib/types/user";
 import { cn } from "@/lib/utils";
-import type { orpc } from "@/utils/orpc";
+import type { orpc } from "@/lib/orpc";
 import appCss from "../index.css?url";
 export interface RouterAppContext {
 	orpc: typeof orpc;

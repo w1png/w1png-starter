@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import ErrorComponent from "./components/error";
 import NotFound from "./components/not-found";
 import { routeTree } from "./routeTree.gen";
-import { orpc, queryClient } from "./utils/orpc";
+import { orpc, queryClient } from "@/lib/orpc";
 
 export const getRouter = () => {
 	const router = createTanStackRouter({

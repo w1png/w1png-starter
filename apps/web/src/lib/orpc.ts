@@ -6,7 +6,7 @@ import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { toast } from "sonner";
-// @ts-expect-error
+// @ts-ignore
 import type { AppRouter } from "../../../server/src/orpc/routers";
 
 export const queryClient = new QueryClient({
