@@ -1,7 +1,7 @@
-import * as React from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
-import { Button } from "./button";
+import * as React from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "./button";
 
 export interface InputProps
 	extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -48,14 +48,14 @@ const Input = React.forwardRef<
 
 					{variant === "default" ? (
 						<input
-							type={type}
 							className={inputClassName}
 							placeholder={placeholder}
 							ref={ref as React.Ref<HTMLInputElement>}
+							type={type}
 							{...props}
 						/>
 					) : (
-						// @ts-ignore
+						// @ts-expect-error
 						<textarea
 							className={cn(inputClassName)}
 							placeholder={placeholder}
@@ -92,18 +92,18 @@ const PasswordInput = React.forwardRef<HTMLInputElement, InputProps>(
 			<div className="h-fit relative flex">
 				<Input
 					autoComplete="current-password"
-					type={visible ? "text" : "password"}
 					className="pr-12"
 					ref={ref}
+					type={visible ? "text" : "password"}
 					{...props}
 				/>
 				<Button
-					tabIndex={-1}
+					className="absolute h-12 right-0 inset-y-0 text-muted-foreground"
+					onClick={() => setVisible(!visible)}
 					size="icon"
+					tabIndex={-1}
 					type="button"
 					variant="transparent"
-					onClick={() => setVisible(!visible)}
-					className="absolute h-12 right-0 inset-y-0 text-muted-foreground"
 				>
 					{visible ? (
 						<EyeOffIcon className="size-8" />

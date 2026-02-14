@@ -16,17 +16,8 @@ const handler = new RPCHandler(appRouter, {
 	plugins: [new ResponseHeadersPlugin()],
 });
 
-const app = new Elysia()
+const _app = new Elysia()
 	.onError(ApiLogger)
-	// .use(
-	// 	cron({
-	// 		name: "something",
-	// 		pattern: "*/10 * * * * *",
-	// 		run: async () => {
-	// 			console.log("Cron job ran");
-	// 		},
-	// 	}),
-	// )
 	.use(
 		cors({
 			origin: env.FRONTEND_URL || "",

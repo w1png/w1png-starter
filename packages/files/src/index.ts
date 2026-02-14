@@ -27,7 +27,11 @@ export async function UploadFile({ file }: { file: File }) {
 		})
 		.returning({ id: files.id });
 
-	const id = f!.id;
+	const id = f?.id;
+
+	if (!id) {
+		throw new Error("Failed to upload file");
+	}
 
 	const metadata = s3.file(id);
 

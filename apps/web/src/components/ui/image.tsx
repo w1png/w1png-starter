@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/a11y/useAltText: <explanation> */
 import { ImageOff } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -30,17 +29,18 @@ export default function Image({ src, imageClassName, ...props }: ImageProps) {
 					)}
 					<img
 						{...props}
-						src={`${import.meta.env.VITE_SERVER_URL}/file/${src}`}
+						alt=""
 						className={cn("size-full object-cover", imageClassName)}
 						crossOrigin="use-credentials"
-						onLoad={() => {
-							setIsLoading(false);
-						}}
 						onError={(e) => {
 							console.error(e.type);
 							setError(true);
 							setIsLoading(false);
 						}}
+						onLoad={() => {
+							setIsLoading(false);
+						}}
+						src={`${import.meta.env.VITE_SERVER_URL}/file/${src}`}
 					/>
 				</div>
 			)}

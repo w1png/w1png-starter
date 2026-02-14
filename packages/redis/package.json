@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "tsc --watch",
 		"check:types": "tsc --noEmit",
-    "check:lint": "biome check",
+		"check:lint": "biome check",
 		"build": "tsc"
 	},
 	"exports": {

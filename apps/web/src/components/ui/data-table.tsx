@@ -68,8 +68,8 @@ export function DataTable<TData, TValue>({
 				{table.getRowModel().rows?.length ? (
 					table.getRowModel().rows.map((row) => (
 						<TableRow
-							key={row.id}
 							data-state={row.getIsSelected() && "selected"}
+							key={row.id}
 						>
 							{row.getVisibleCells().map((cell) => (
 								<TableCell key={cell.id}>
@@ -80,7 +80,7 @@ export function DataTable<TData, TValue>({
 					))
 				) : (
 					<TableRow>
-						<TableCell colSpan={columns.length} className="h-24 text-center">
+						<TableCell className="h-24 text-center" colSpan={columns.length}>
 							Ничего не найдено.
 						</TableCell>
 					</TableRow>
@@ -112,14 +112,12 @@ export function FilterableHeader<
 
 	useEffect(() => {
 		context.column.setFilterValue(val);
-	}, [search[searchKey]]);
+	}, [context.column.setFilterValue, val]);
 
 	return (
 		<div className="flex items-center justify-between w-full">
 			{children}
 			<MultpleSelect
-				values={values}
-				value={values.filter((v) => val?.includes(v.id)) ?? []}
 				onChange={(v) => {
 					navigate({
 						to: ".",
@@ -133,6 +131,8 @@ export function FilterableHeader<
 					default: "Выберите значения",
 					empty: "Нет значений",
 				}}
+				value={values.filter((v) => val?.includes(v.id)) ?? []}
+				values={values}
 			>
 				<Button
 					className="size-fit p-1"
@@ -161,12 +161,13 @@ export function SortableHeader<TData, TValue>({
 
 	useEffect(() => {
 		context.column.toggleSorting(val === "asc");
-	}, [search[searchKey]]);
+	}, [context.column.toggleSorting, val]);
 
 	return (
 		<div className="flex items-center justify-between w-full">
 			{children}
 			<Button
+				className="size-fit p-1"
 				onClick={() => {
 					navigate({
 						to: ".",
@@ -177,7 +178,6 @@ export function SortableHeader<TData, TValue>({
 						replace: true,
 					});
 				}}
-				className="size-fit p-1"
 				variant={val ? "secondary" : "outline"}
 			>
 				{val === "desc" ? (

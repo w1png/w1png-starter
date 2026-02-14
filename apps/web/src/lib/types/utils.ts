@@ -1,9 +1,9 @@
 import type { RegisteredRouter } from "@tanstack/react-router";
 import type {
-	FullSearchSchema,
 	AllContext,
-	RoutePaths,
+	FullSearchSchema,
 	ResolveParams,
+	RoutePaths,
 } from "@tanstack/router-core";
 
 export type FullSearchParams = FullSearchSchema<RegisteredRouter["routeTree"]>;

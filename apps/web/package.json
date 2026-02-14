@@ -6,11 +6,10 @@
 		"build": "vite build",
 		"serve": "vite preview",
 		"dev": "vite dev --port=3001",
-    "check:types": "tsc --noEmit",
-    "check:lint": "biome check"
+		"check:types": "tsc --noEmit",
+		"check:lint": "biome check"
 	},
 	"dependencies": {
-		"@fontsource-variable/unbounded": "^5.2.6",
 		"@lunarweb/shared": "workspace:*",
 		"@orpc/client": "catalog:",
 		"@orpc/server": "catalog:",

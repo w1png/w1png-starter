@@ -1,7 +1,7 @@
-import Loader from "@/components/loader";
-import { authClient } from "@/lib/auth-client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
+import Loader from "@/components/loader";
+import { authClient } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/auth/sign-out")({
 	component: SignOutPage,
@@ -16,7 +16,7 @@ function SignOutPage() {
 				to: "/auth/sign-in",
 			}),
 		);
-	}, []);
+	}, [navigate]);
 
 	return <Loader />;
 }

@@ -6,13 +6,13 @@ import {
 	Scripts,
 	useRouterState,
 } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import Loader from "@/components/loader";
 import { Toaster } from "@/components/ui/sonner";
 import type { Session } from "@/lib/types/user";
+import { cn } from "@/lib/utils";
 import type { orpc } from "@/utils/orpc";
 import appCss from "../index.css?url";
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
 export interface RouterAppContext {
 	orpc: typeof orpc;
 	queryClient: QueryClient;
@@ -85,7 +85,7 @@ function RootDocument() {
 	}, [isFetching]);
 
 	return (
-		<html lang="en" className="dark">
+		<html className="dark" lang="en">
 			<head>
 				<HeadContent />
 			</head>

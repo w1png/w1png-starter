@@ -6,7 +6,7 @@
 		"dev": "tsc --watch",
 		"build": "tsc",
 		"check:types": "tsc --noEmit",
-    "check:lint": "biome check",
+		"check:lint": "biome check",
 		"tg:webhook": "bun run src/webhook.ts"
 	},
 	"exports": {

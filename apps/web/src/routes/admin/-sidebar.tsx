@@ -1,4 +1,8 @@
 import { Link, useLocation, useRouteContext } from "@tanstack/react-router";
+import { ArrowLeftToLineIcon, HouseIcon, XIcon } from "lucide-react";
+import Logo from "@/components/icons/logo";
+import { Button } from "@/components/ui/button";
+import { SheetClose } from "@/components/ui/sheet";
 import {
 	Sidebar,
 	SidebarContent,
@@ -12,11 +16,7 @@ import {
 	SidebarTrigger,
 	useSidebar,
 } from "@/components/ui/sidebar";
-import { ArrowLeftToLineIcon, HouseIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SheetClose } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import Logo from "@/components/icons/logo";
 
 export interface SidebarItem {
 	label: string;
@@ -62,7 +62,7 @@ export default function DashboardSidebar() {
 				<SidebarTrigger />
 			</div>
 
-			<Sidebar collapsible="icon" className="p-4 pr-0 bg-secondary">
+			<Sidebar className="p-4 pr-0 bg-secondary" collapsible="icon">
 				<SidebarHeader className="lg:rounded-2xl border bg-white p-4">
 					<div className="flex justify-between md:hidden w-full">
 						<span className="hidden lg:block">
@@ -70,7 +70,7 @@ export default function DashboardSidebar() {
 						</span>
 						{sidebar.isMobile && (
 							<SheetClose asChild>
-								<Button variant="secondary" size="icon">
+								<Button size="icon" variant="secondary">
 									<XIcon className="!size-5" />
 								</Button>
 							</SheetClose>
@@ -81,7 +81,7 @@ export default function DashboardSidebar() {
 							<SidebarTrigger />
 						) : (
 							<>
-								<Link to="/" className="size-fit">
+								<Link className="size-fit" to="/">
 									<Logo />
 								</Link>
 								<SidebarTrigger />
@@ -94,8 +94,8 @@ export default function DashboardSidebar() {
 					<div className="flex flex-col grow w-full">
 						{blocks.map((block, index) => (
 							<SidebarGroup
-								key={`block-${index.toString()}`}
 								className={cn("py-2", index !== blocks.length - 1 && "border")}
+								key={`block-${index.toString()}`}
 							>
 								<SidebarGroupContent>
 									<SidebarMenu>
@@ -108,13 +108,13 @@ export default function DashboardSidebar() {
 													tooltip={item.label} // ← shows on hover when collapsed
 												>
 													<Link
-														to={item.href}
 														className="flex items-center gap-3"
 														onClick={() => {
 															if (sidebar.isMobile) {
 																sidebar.setOpenMobile(false);
 															}
 														}}
+														to={item.href}
 													>
 														{item.icon}
 														<span className="group-data-[collapsible=icon]:hidden">
@@ -136,8 +136,8 @@ export default function DashboardSidebar() {
 								<div className="hidden md:flex justify-between items-center h-fit">
 									<UserProfile />
 									<Link
-										to="/auth/sign-out"
 										className="text-muted-foreground hover:text-foreground transition"
+										to="/auth/sign-out"
 									>
 										<ArrowLeftToLineIcon className="!size-6" />
 									</Link>

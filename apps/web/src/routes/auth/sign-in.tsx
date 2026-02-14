@@ -1,12 +1,12 @@
+import { useForm } from "@tanstack/react-form";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import z from "zod/v4";
 import Loader from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
-import { useForm } from "@tanstack/react-form";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
-import z from "zod/v4";
 
 export const Route = createFileRoute("/auth/sign-in")({
 	component: SignInPage,
@@ -59,12 +59,12 @@ function SignInPage() {
 			<h1 className="mb-6 text-center text-3xl font-bold">Авторизация</h1>
 
 			<form
+				className="space-y-4"
 				onSubmit={(e) => {
 					e.preventDefault();
 					e.stopPropagation();
 					void form.handleSubmit();
 				}}
-				className="space-y-4"
 			>
 				<div>
 					<form.Field name="email">
@@ -74,13 +74,13 @@ function SignInPage() {
 								<Input
 									id={field.name}
 									name={field.name}
-									type="email"
-									value={field.state.value}
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
+									type="email"
+									value={field.state.value}
 								/>
 								{field.state.meta.errors.map((error) => (
-									<p key={error?.message} className="text-red-500">
+									<p className="text-red-500" key={error?.message}>
 										{error?.message}
 									</p>
 								))}
@@ -97,13 +97,13 @@ function SignInPage() {
 								<Input
 									id={field.name}
 									name={field.name}
-									type="password"
-									value={field.state.value}
 									onBlur={field.handleBlur}
 									onChange={(e) => field.handleChange(e.target.value)}
+									type="password"
+									value={field.state.value}
 								/>
 								{field.state.meta.errors.map((error) => (
-									<p key={error?.message} className="text-red-500">
+									<p className="text-red-500" key={error?.message}>
 										{error?.message}
 									</p>
 								))}
@@ -115,9 +115,9 @@ function SignInPage() {
 				<form.Subscribe>
 					{(state) => (
 						<Button
-							type="submit"
 							className="w-full"
 							disabled={!state.canSubmit || state.isSubmitting}
+							type="submit"
 						>
 							{state.isSubmitting ? "Submitting..." : "Sign In"}
 						</Button>

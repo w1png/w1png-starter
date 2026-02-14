@@ -1,6 +1,6 @@
-import { UploadIcon, FileIcon, X } from "lucide-react";
-import React, { useEffect, useState } from "react";
 import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
+import { FileIcon, UploadIcon, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { Button } from "./button";
 
 export interface FileInputProps
@@ -81,15 +81,15 @@ export function FileCard({
 	return (
 		<div className="flex items-center justify-between p-4 border rounded-md">
 			<div className="flex items-center gap-2">
-				{contentType?.startsWith("image/") ? (
+				{contentType?.startsWith("image/") && file ? (
 					<img
-						src={
-							isUploading
-								? URL.createObjectURL(file!)
-								: `${serverUrl}/file/${id}`
-						}
 						alt={name}
 						className="size-9 object-cover rounded"
+						src={
+							isUploading
+								? URL.createObjectURL(file)
+								: `${serverUrl}/file/${id}`
+						}
 					/>
 				) : (
 					<div className="relative">
@@ -105,9 +105,9 @@ export function FileCard({
 				<div className="flex flex-col">
 					{!isUploading && !error && id ? (
 						<a
-							href={`${serverUrl}/file/${id}`}
-							download={name}
 							className="cursor-pointer hover:underline hover:text-primary transition"
+							download={name}
+							href={`${serverUrl}/file/${id}`}
 						>
 							{name}
 						</a>
@@ -127,10 +127,10 @@ export function FileCard({
 							<>
 								<span>•</span>
 								<svg
-									width="14"
+									fill="none"
 									height="14"
 									viewBox="0 0 14 14"
-									fill="none"
+									width="14"
 									xmlns="http://www.w3.org/2000/svg"
 								>
 									<path
@@ -154,11 +154,11 @@ export function FileCard({
 			<div className="flex gap-1 h-full">
 				{onDelete && (
 					<Button
+						className="p-0 size-fit cursor-pointer hover:text-muted-foreground"
 						onClick={onDelete}
+						size="icon"
 						type="button"
 						variant="transparent"
-						size="icon"
-						className="p-0 size-fit cursor-pointer hover:text-muted-foreground"
 					>
 						<X className="size-4" />
 					</Button>
@@ -320,13 +320,13 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 						e.preventDefault();
 						setIsDragging(true);
 					}}
-					onDragOver={(e) => {
-						e.preventDefault();
-						setIsDragging(true);
-					}}
 					onDragLeave={(e) => {
 						e.preventDefault();
 						setIsDragging(false);
+					}}
+					onDragOver={(e) => {
+						e.preventDefault();
+						setIsDragging(true);
 					}}
 					onDrop={handleDrop}
 				>
@@ -342,9 +342,9 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 
 					<input
 						className="hidden"
-						type="file"
-						ref={ref}
 						onChange={handleChange}
+						ref={ref}
+						type="file"
 						{...props}
 					/>
 				</label>
@@ -352,28 +352,28 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 				<div className="flex flex-col gap-2 w-full">
 					{uploadedFiles.map((f) => (
 						<FileCard
+							contentType={f.contentType}
+							id={f.id}
 							key={f.id}
 							name={f.name}
 							onDelete={() => handleDeleteUploaded(f.id)}
-							id={f.id}
-							contentType={f.contentType}
 							size={f.size}
 						/>
 					))}
 
 					{uploadingFiles.map((u) => (
 						<FileCard
-							key={u.key}
-							name={u.file.name}
-							progress={u.progress}
-							isUploading={true}
+							contentType={u.file.type}
 							error={u.error}
 							file={u.file}
-							contentType={u.file.type}
-							size={u.file.size}
+							isUploading={true}
+							key={u.key}
+							name={u.file.name}
 							onDelete={
 								u.error ? () => handleDeleteUploading(u.key) : undefined
 							}
+							progress={u.progress}
+							size={u.file.size}
 						/>
 					))}
 				</div>

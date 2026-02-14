@@ -1,7 +1,8 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
+import { cn } from "@/lib/utils";
 import {
 	Command,
 	CommandEmpty,
@@ -11,12 +12,10 @@ import {
 	CommandList,
 } from "./command";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
-import { cn } from "@/lib/utils";
 
 type Item = {
 	id: string;
 	name: string;
-	[key: string]: any;
 };
 
 export default function MultpleSelect<T extends Item>({
@@ -60,7 +59,7 @@ export default function MultpleSelect<T extends Item>({
 
 	return (
 		<div className="flex flex-col">
-			<Popover open={open} onOpenChange={setOpen} modal={modal}>
+			<Popover modal={modal} onOpenChange={setOpen} open={open}>
 				<PopoverTrigger asChild>{children}</PopoverTrigger>
 				<PopoverContent>
 					<Command>
@@ -78,9 +77,9 @@ export default function MultpleSelect<T extends Item>({
 									);
 									return (
 										<CommandItem
-											value={v.name}
 											key={v.id}
 											onSelect={() => handleSelect(v)}
+											value={v.name}
 										>
 											<Check
 												className={cn(
