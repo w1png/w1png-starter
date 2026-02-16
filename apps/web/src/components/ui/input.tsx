@@ -2,6 +2,7 @@ import { EyeIcon, EyeOffIcon } from "lucide-react";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
+import Errors from "./errors";
 
 export interface InputProps
 	extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -64,20 +65,7 @@ const Input = React.forwardRef<
 						/>
 					)}
 				</div>
-				<div
-					className={cn(
-						"flex flex-col gap-1 transition-all duration-300",
-						hasErrors
-							? "opacity-100 translate-y-0 blur-none mt-2"
-							: "opacity-0 -translate-y-6 blur-sm",
-					)}
-				>
-					{errors?.filter(Boolean).map((error) => (
-						<p className="text-destructive text-sm" key={error}>
-							{error}
-						</p>
-					))}
-				</div>
+				<Errors errors={errors} />
 			</div>
 		);
 	},

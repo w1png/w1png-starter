@@ -76,7 +76,8 @@ export default function DashboardSidebar() {
 							</SheetClose>
 						)}
 					</div>
-					<div className="hidden md:flex justify-between w-full group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center">
+					{/*
+            					<div className="hidden md:flex justify-between w-full group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center">
 						{sidebar.state === "collapsed" ? (
 							<SidebarTrigger />
 						) : (
@@ -88,6 +89,7 @@ export default function DashboardSidebar() {
 							</>
 						)}
 					</div>
+          */}
 				</SidebarHeader>
 
 				<SidebarContent className="bg-white m-0 lg:mt-4 lg:rounded-2xl border">

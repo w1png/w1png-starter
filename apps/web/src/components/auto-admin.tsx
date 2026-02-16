@@ -1,16 +1,26 @@
 /** biome-ignore-all lint/correctness/useHookAtTopLevel: temp */
 import { orpc, queryClient } from "@/lib/orpc";
-import { FieldApi, useForm } from "@tanstack/react-form";
+import {
+	useForm,
+	type DeepValue,
+	type FormValidateOrFn,
+} from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-	type createFileRoute,
-	getRouteApi,
-	useLoaderData,
+	type AnyRoute,
 	type FileRoute,
 	type FileRoutesByPath,
+	type RouteConstraints,
+	useLoaderData,
 } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { z, type ZodObject, type ZodType, type ZodTypeAny } from "zod/v4";
+import {
+	ZodArray,
+	ZodNullable,
+	ZodOptional,
+	type ZodObject,
+	type ZodType,
+} from "zod/v4";
 import {
 	Dashboard,
 	DashboardContent,
@@ -24,7 +34,13 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { EllipsisVertical, PlusIcon, SquarePenIcon } from "lucide-react";
+import {
+	EllipsisVertical,
+	PlusIcon,
+	SquarePenIcon,
+	Trash,
+	TrashIcon,
+} from "lucide-react";
 import {
 	Dialog,
 	DialogClose,
@@ -43,6 +59,17 @@ import { Input } from "./ui/input";
 import { FileInput } from "./ui/image-input";
 import { Checkbox } from "./ui/checkbox";
 import { DatePicker } from "./ui/date-picker";
+import Errors from "./ui/errors";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "./ui/alert-dialog";
 
 type HasAdminMethods<T> = T extends {
 	getAll: unknown;
@@ -65,21 +92,70 @@ type CreateInput<T extends AdminRouterKeys> = Parameters<
 	AppRouter[T]["create"]["call"]
 >["0"];
 
-function Delete() {
-	return "delete";
+function Delete({
+	value,
+	router: routerKey,
+}: {
+	value: Awaited<
+		ReturnType<(typeof orpc)[AdminRouterKeys]["getAll"]["call"]>
+	>[number];
+	router: AdminRouterKeys;
+}) {
+	const [open, setOpen] = useState(false);
+
+	const router = orpc[routerKey];
+	const deleteMutation = useMutation(
+		router.delete.mutationOptions({
+			onSuccess: async () => {
+				toast.success("Удалено");
+				await queryClient.invalidateQueries({
+					queryKey: router.getAll.key(),
+				});
+				setOpen(false);
+			},
+		}),
+	);
+
+	return (
+		<AlertDialog open={open} onOpenChange={setOpen}>
+			<AlertDialogTrigger asChild>
+				<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+					<Trash />
+					<span>Удалить</span>
+				</DropdownMenuItem>
+			</AlertDialogTrigger>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle>Удалить занятие?</AlertDialogTitle>
+				</AlertDialogHeader>
+				<AlertDialogFooter>
+					<AlertDialogCancel>Отмена</AlertDialogCancel>
+					<AlertDialogAction asChild>
+						<Button
+							loading={deleteMutation.isPending}
+							onClick={() => {
+								deleteMutation.mutate({ id: value.id });
+							}}
+						>
+							Удалить
+						</Button>
+					</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
+	);
 }
 
-function getRealZodType(zodType: ZodTypeAny) {
-	const type = zodType.type;
-	switch (type) {
-		case "optional":
-		case "nullable":
-			return getRealZodType(zodType.unwrap?.());
-		case "array":
-			return getRealZodType(zodType.element);
-		default:
-			return zodType;
+function getRealZodType(zodType: ZodType) {
+	if (zodType instanceof ZodNullable || zodType instanceof ZodOptional) {
+		return getRealZodType(zodType.unwrap() as ZodType);
 	}
+
+	if (zodType instanceof ZodArray) {
+		return getRealZodType(zodType.element as ZodType);
+	}
+
+	return zodType;
 }
 
 function CreateUpdate<R extends AdminRouterKeys, S extends ZodObject>({
@@ -93,7 +169,7 @@ function CreateUpdate<R extends AdminRouterKeys, S extends ZodObject>({
 }) {
 	const [open, setOpen] = useState(false);
 
-	const router = orpc.tests;
+	const router = orpc[routerKey];
 
 	const createMutation = useMutation(
 		router.create.mutationOptions({
@@ -118,8 +194,19 @@ function CreateUpdate<R extends AdminRouterKeys, S extends ZodObject>({
 	);
 
 	const form = useForm({
+		defaultValues: value as CreateInput<R>,
+		onSubmit: ({ value: data }) => {
+			if (value) {
+				updateMutation.mutate({
+					...data,
+					id: value.id,
+				});
+			} else {
+				createMutation.mutate(data);
+			}
+		},
 		validators: {
-			onSubmit: schema,
+			onSubmit: schema as FormValidateOrFn<CreateInput<R>>,
 		},
 	});
 
@@ -130,20 +217,96 @@ function CreateUpdate<R extends AdminRouterKeys, S extends ZodObject>({
 	}: {
 		k: string;
 		zodField: ZodType;
-		field: typeof form.Field;
+		field: Parameters<Parameters<typeof form.Field>[0]["children"]>[0];
 	}) {
+		const [newArrayValue, setNewArrayValue] = useState<string>("");
+
 		const isArray = zodField.type === "array";
 		const isFile = zodField.description?.includes("FILE");
 		const realType = getRealZodType(zodField).type;
 
+		type CastedValue = DeepValue<CreateInput<R>, any>;
+
 		if (isFile) {
+			const val =
+				isArray || !field.state.value
+					? ((field.state.value ?? []) as string[])
+					: [field.state.value as string];
+
+			const onChange = (i: string[]) => {
+				if (isArray) {
+					field.handleChange(i as CastedValue);
+					return;
+				}
+
+				field.handleChange(i.at(-1) as CastedValue);
+			};
+
 			return (
 				<FileInput
-					fileIds={(field.state.value ?? []) as string[]}
+					fileIds={val}
 					setIsLoading={() => {}}
-					setFileIds={(i) => field.handleChange(i)}
+					setFileIds={onChange}
 					multiple={isArray}
 				/>
+			);
+		}
+
+		if (isArray) {
+			const fieldValue = (field.state.value ?? []) as string[];
+
+			return (
+				<div className="space-y-2">
+					<div className="flex gap-2 items-center w-full">
+						<Input
+							className="grow"
+							value={newArrayValue}
+							onChange={(e) => setNewArrayValue(e.target.value)}
+						/>
+						<Button
+							disabled={!newArrayValue}
+							onClick={() => {
+								if (!newArrayValue) return;
+								field.pushValue(newArrayValue as never);
+								setNewArrayValue("");
+							}}
+							type="button"
+							size="icon"
+							className="aspect-square h-auto"
+						>
+							<PlusIcon />
+						</Button>
+					</div>
+					{fieldValue.map((_, i) => (
+						<form.Field name={`${k}[${i}]`} key={`${k}[${i.toString()}]`}>
+							{(childField) => (
+								<div className="flex gap-2 items-center w-full">
+									<Input
+										className="grow"
+										value={childField.state.value as string}
+										onChange={(e) =>
+											childField.handleChange(e.target.value as CastedValue)
+										}
+										errors={childField.state.meta.errors.map(
+											(e) => (e as { message: string } | undefined)?.message,
+										)}
+									/>
+									<Button
+										onClick={() => {
+											field.removeValue(i);
+										}}
+										type="button"
+										variant="destructive"
+										size="icon"
+										className="aspect-square h-auto"
+									>
+										<TrashIcon />
+									</Button>
+								</div>
+							)}
+						</form.Field>
+					))}
+				</div>
 			);
 		}
 
@@ -153,26 +316,48 @@ function CreateUpdate<R extends AdminRouterKeys, S extends ZodObject>({
 				return (
 					<Input
 						value={field.state.value as string}
-						onChange={(e) => field.handleChange(e.target.value)}
+						onChange={(e) => field.handleChange(e.target.value as CastedValue)}
 						onBlur={field.handleBlur}
-						errors={field.state.meta.errors.map((e) => e?.message)}
+						errors={field.state.meta.errors.map(
+							(e) => (e as { message: string } | undefined)?.message,
+						)}
 					/>
 				);
 			}
 			case "boolean": {
 				return (
-					<Checkbox
-						onCheckedChange={(v) => field.handleChange(v.valueOf() as boolean)}
-						checked={field.state.value as boolean}
-					/>
+					<>
+						<Checkbox
+							onCheckedChange={(v) =>
+								field.handleChange(v.valueOf() as CastedValue)
+							}
+							checked={field.state.value as boolean}
+						/>
+						<Errors
+							errors={field.state.meta.errors.map(
+								(e) => (e as { message: string } | undefined)?.message,
+							)}
+						/>
+					</>
 				);
 			}
 			case "date": {
 				return (
-					<DatePicker
-						value={field.state.value as Date}
-						onChange={(v) => field.handleChange(v)}
-					/>
+					<>
+						<DatePicker
+							value={
+								field.state.value
+									? new Date(field.state.value as string)
+									: undefined
+							}
+							onChange={(v) => field.handleChange(v as CastedValue)}
+						/>
+						<Errors
+							errors={field.state.meta.errors.map(
+								(e) => (e as { message: string } | undefined)?.message,
+							)}
+						/>
+					</>
 				);
 			}
 
@@ -258,20 +443,22 @@ function CreateUpdate<R extends AdminRouterKeys, S extends ZodObject>({
 	);
 }
 
-type A = Parameters<ReturnType<typeof createFileRoute>>["0"];
-
 export default function AutoAdmin<
 	R extends AdminRouterKeys,
 	S extends ZodObject,
+	TFilePath extends keyof FileRoutesByPath,
+	TParentRoute extends AnyRoute = FileRoutesByPath[TFilePath]["parentRoute"],
+	TId extends RouteConstraints["TId"] = FileRoutesByPath[TFilePath]["id"],
+	TPath extends RouteConstraints["TPath"] = FileRoutesByPath[TFilePath]["path"],
+	TFullPath extends
+		RouteConstraints["TFullPath"] = FileRoutesByPath[TFilePath]["fullPath"],
 >({
 	schema,
-	path,
 	router: routerKey,
 	header,
 }: {
 	header: string;
 	router: R;
-	path: keyof FileRoutesByPath;
 	schema: S & {
 		_output: CreateInput<R> &
 			(
@@ -285,7 +472,9 @@ export default function AutoAdmin<
 				  }
 			);
 	};
-}): Parameters<ReturnType<typeof createFileRoute>>[0] {
+}): Parameters<
+	FileRoute<TFilePath, TParentRoute, TId, TPath, TFullPath>["createRoute"]
+>[0] {
 	const router = orpc[routerKey];
 
 	return {
