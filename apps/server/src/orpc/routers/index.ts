@@ -4,7 +4,7 @@ import { testRouter } from "./test";
 
 export const appRouter = {
 	users: usersRouter,
-  tests: testRouter
+	tests: testRouter,
 };
 
 export type AppRouter = typeof appRouter;
