@@ -21,7 +21,7 @@ export interface RouterAppContext {
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
 	async beforeLoad(ctx) {
-		const session = await ctx.context.orpc.user.session.get.call();
+		const session = await ctx.context.orpc.users.session.get.call();
 		return {
 			session,
 		};

@@ -57,5 +57,20 @@ CREATE TABLE "files" (
 	"content_type" varchar(255) NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "tests" (
+	"id" varchar(255) PRIMARY KEY NOT NULL,
+	"serial" serial NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"deleted_at" timestamp,
+	"image_id" varchar(255) NOT NULL,
+	"image_ids" varchar(255)[],
+	"name" varchar(255) NOT NULL,
+	"someval" varchar[] NOT NULL,
+	"num" integer NOT NULL,
+	"bool" boolean NOT NULL,
+	"date" timestamp
+);
+--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "tests" ADD CONSTRAINT "tests_image_id_files_id_fk" FOREIGN KEY ("image_id") REFERENCES "public"."files"("id") ON DELETE no action ON UPDATE no action;

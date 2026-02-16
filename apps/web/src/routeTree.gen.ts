@@ -17,6 +17,7 @@ import { Route as LandingIndexRouteImport } from './routes/_landing/index'
 import { Route as AuthSignUpRouteImport } from './routes/auth/sign-up'
 import { Route as AuthSignOutRouteImport } from './routes/auth/sign-out'
 import { Route as AuthSignInRouteImport } from './routes/auth/sign-in'
+import { Route as AdminTestsIndexRouteImport } from './routes/admin/tests/index'
 import { Route as LandingPolicyIndexRouteImport } from './routes/_landing/policy/index'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -58,6 +59,11 @@ const AuthSignInRoute = AuthSignInRouteImport.update({
   path: '/auth/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminTestsIndexRoute = AdminTestsIndexRouteImport.update({
+  id: '/tests/',
+  path: '/tests/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const LandingPolicyIndexRoute = LandingPolicyIndexRouteImport.update({
   id: '/policy/',
   path: '/policy/',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/auth/sign-up': typeof AuthSignUpRoute
   '/admin/': typeof AdminIndexRoute
   '/policy/': typeof LandingPolicyIndexRoute
+  '/admin/tests/': typeof AdminTestsIndexRoute
 }
 export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/': typeof LandingIndexRoute
   '/admin': typeof AdminIndexRoute
   '/policy': typeof LandingPolicyIndexRoute
+  '/admin/tests': typeof AdminTestsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/_landing/': typeof LandingIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/_landing/policy/': typeof LandingPolicyIndexRoute
+  '/admin/tests/': typeof AdminTestsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/auth/sign-up'
     | '/admin/'
     | '/policy/'
+    | '/admin/tests/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/sitemap.xml'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/policy'
+    | '/admin/tests'
   id:
     | '__root__'
     | '/_landing'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '/_landing/'
     | '/admin/'
     | '/_landing/policy/'
+    | '/admin/tests/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -195,6 +207,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignInRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/tests/': {
+      id: '/admin/tests/'
+      path: '/tests'
+      fullPath: '/admin/tests/'
+      preLoaderRoute: typeof AdminTestsIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/_landing/policy/': {
       id: '/_landing/policy/'
       path: '/policy'
@@ -221,10 +240,12 @@ const LandingRouteRouteWithChildren = LandingRouteRoute._addFileChildren(
 
 interface AdminRouteRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminTestsIndexRoute: typeof AdminTestsIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
+  AdminTestsIndexRoute: AdminTestsIndexRoute,
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(

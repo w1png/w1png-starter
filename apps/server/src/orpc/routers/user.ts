@@ -1,6 +1,6 @@
 import { publicProcedure } from "../orpc";
 
-export const userRouter = {
+export const usersRouter = {
 	session: {
 		get: publicProcedure.handler(async ({ context }) => context.session),
 	},

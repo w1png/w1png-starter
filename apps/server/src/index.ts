@@ -11,12 +11,16 @@ import { env } from "@lunarweb/env";
 import { auth } from "./auth/auth";
 import { createContext } from "./orpc/context";
 import { fileRouter } from "@lunarweb/files";
+import { createMainAdminIfNotExists } from "./auth/create-main-admin";
 
 const handler = new RPCHandler(appRouter, {
 	plugins: [new ResponseHeadersPlugin()],
 });
 
 const _app = new Elysia()
+  .onStart(async () => {
+    await createMainAdminIfNotExists();
+  })
 	.onError(ApiLogger)
 	.use(
 		cors({

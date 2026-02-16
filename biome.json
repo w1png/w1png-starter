@@ -50,7 +50,6 @@
         "noNoninteractiveElementToInteractiveRole": "warn",
         "noPositiveTabindex": "warn",
         "useAriaPropsForRole": "warn",
-        "useAriaRole": "warn",
         "useHeadingContent": "warn",
         "useHtmlLang": "warn",
         "useIframeTitle": "warn",

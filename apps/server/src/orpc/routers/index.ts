@@ -1,8 +1,10 @@
 import type { InferRouterInputs, InferRouterOutputs } from "@orpc/server";
-import { userRouter } from "./user";
+import { usersRouter } from "./user";
+import { testRouter } from "./test";
 
 export const appRouter = {
-	user: userRouter,
+	users: usersRouter,
+  tests: testRouter
 };
 
 export type AppRouter = typeof appRouter;

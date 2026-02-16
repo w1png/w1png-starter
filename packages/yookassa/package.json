@@ -1,0 +1,26 @@
+{
+	"name": "@lunarweb/yookassa",
+	"module": "src/index.ts",
+	"type": "module",
+	"scripts": {
+		"dev": "tsc --watch",
+		"check:types": "tsc --noEmit",
+		"check:lint": "biome check",
+		"build": "tsc"
+	},
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"default": "./dist/index.js"
+		}
+	},
+	"devDependencies": {
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"@a2seven/yoo-checkout": "^1.1.4"
+	}
+}
