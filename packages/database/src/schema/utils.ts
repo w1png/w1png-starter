@@ -28,9 +28,9 @@ export function defaultIdx<
 		deletedAt: pg.ExtraConfigColumn<ColumnBaseConfig<ColumnDataType, string>>;
 	},
 >(t: T) {
-	return {
-		deleted_at_null_idx: pg.index().on(t.deletedAt).where(isNull(t.deletedAt)),
-		id_idx: pg.index().on(t.id),
-		created_at_idx: pg.index().on(t.createdAt),
-	};
+	return [
+		pg.index("deleted_at_null_idx").on(t.deletedAt).where(isNull(t.deletedAt)),
+		pg.index("id_idx").on(t.id),
+		pg.index("created_at_idx").on(t.createdAt),
+	];
 }
