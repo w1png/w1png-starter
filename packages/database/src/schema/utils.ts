@@ -1,11 +1,36 @@
-import { serial, timestamp, varchar } from "drizzle-orm/pg-core";
+import {
+	isNull,
+	type ColumnBaseConfig,
+	type ColumnDataType,
+} from "drizzle-orm";
+import * as pg from "drizzle-orm/pg-core";
 
 export const commonFields = {
-	id: varchar("id", { length: 255 })
+	id: pg
+		.varchar("id", { length: 255 })
 		.notNull()
 		.primaryKey()
 		.$defaultFn(() => Bun.randomUUIDv7()),
-	serial: serial("serial").notNull(),
-	createdAt: timestamp("created_at").notNull().defaultNow(),
-	deletedAt: timestamp("deleted_at"),
+	serial: pg.serial("serial").notNull(),
+	createdAt: pg.timestamp("created_at").notNull().defaultNow(),
+	updatedAt: pg
+		.timestamp("updated_at")
+		.notNull()
+		.defaultNow()
+		.$onUpdateFn(() => new Date()),
+	deletedAt: pg.timestamp("deleted_at"),
 };
+
+export function defaultIdx<
+	T extends {
+		id: pg.ExtraConfigColumn<ColumnBaseConfig<ColumnDataType, string>>;
+		createdAt: pg.ExtraConfigColumn<ColumnBaseConfig<ColumnDataType, string>>;
+		deletedAt: pg.ExtraConfigColumn<ColumnBaseConfig<ColumnDataType, string>>;
+	},
+>(t: T) {
+	return {
+		deleted_at_null_idx: pg.index().on(t.deletedAt).where(isNull(t.deletedAt)),
+		id_idx: pg.index().on(t.id),
+		created_at_idx: pg.index().on(t.createdAt),
+	};
+}

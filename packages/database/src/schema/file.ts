@@ -1,10 +1,14 @@
-import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
-import { commonFields } from "./utils";
+import * as pg from "drizzle-orm/pg-core";
+import { commonFields, defaultIdx } from "./utils";
 
-export const files = pgTable("files", {
-	...commonFields,
+export const files = pg.pgTable(
+	"files",
+	{
+		...commonFields,
 
-	name: varchar("name", { length: 255 }).notNull(),
-	size: integer("size").notNull(),
-	contentType: varchar("content_type", { length: 255 }).notNull(),
-});
+		name: pg.varchar("name", { length: 255 }).notNull(),
+		size: pg.integer("size").notNull(),
+		contentType: pg.varchar("content_type", { length: 255 }).notNull(),
+	},
+	defaultIdx,
+);
