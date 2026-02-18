@@ -27,10 +27,15 @@ export function defaultIdx<
 		createdAt: pg.ExtraConfigColumn<ColumnBaseConfig<ColumnDataType, string>>;
 		deletedAt: pg.ExtraConfigColumn<ColumnBaseConfig<ColumnDataType, string>>;
 	},
->(t: T) {
-	return [
-		pg.index("deleted_at_null_idx").on(t.deletedAt).where(isNull(t.deletedAt)),
-		pg.index("id_idx").on(t.id),
-		pg.index("created_at_idx").on(t.createdAt),
-	];
+>(prefix: string) {
+	return (t: T) => {
+		return [
+			pg
+				.index(`${prefix}_deleted_at_null_idx`)
+				.on(t.deletedAt)
+				.where(isNull(t.deletedAt)),
+			pg.index(`${prefix}_id_idx`).on(t.id),
+			pg.index(`${prefix}_created_at_idx`).on(t.createdAt),
+		];
+	};
 }

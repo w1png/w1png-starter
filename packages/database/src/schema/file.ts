@@ -10,5 +10,5 @@ export const files = pg.pgTable(
 		size: pg.integer("size").notNull(),
 		contentType: pg.varchar("content_type", { length: 255 }).notNull(),
 	},
-	defaultIdx,
+	defaultIdx("files"),
 );

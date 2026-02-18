@@ -17,5 +17,5 @@ export const tests = pg.pgTable(
 		bool: pg.boolean().notNull(),
 		date: pg.timestamp(),
 	},
-	defaultIdx,
+	defaultIdx("tests"),
 );
