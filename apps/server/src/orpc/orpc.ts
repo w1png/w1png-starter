@@ -29,7 +29,7 @@ const requireAuth = o.middleware(async ({ context, next }) => {
 
 export const roleProcedure = (roles: UserRole[]) => {
 	return protectedProcedure.use(async ({ context, next, path }) => {
-		if (roles.includes(context.session.user.role)) {
+		if (!roles.includes(context.session.user.role)) {
 			throw new ORPCError("FORBIDDEN", {
 				message: `User has role: ${context.session.user.role} but ${roles.join(", ")} are required for ${path.join(".")}`,
 			});
