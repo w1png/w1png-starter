@@ -29,8 +29,8 @@ export const getClientLink = createIsomorphicFn()
 		() =>
 			new RPCLink({
 				url: `${import.meta.env.VITE_SERVER_URL}/rpc`,
-				fetch(url, options) {
-					return fetch(url, {
+				fetch(request, options) {
+					return fetch(request, {
 						...options,
 						credentials: "include",
 					});
@@ -44,9 +44,9 @@ export const getClientLink = createIsomorphicFn()
 				headers: () => {
 					return getRequest().headers;
 				},
-				fetch(url, options) {
+				fetch(request, options) {
 					try {
-						return fetch(url, {
+						return fetch(request, {
 							...options,
 							credentials: "include",
 						});
