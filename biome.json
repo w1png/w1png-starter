@@ -1,93 +1,94 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.15/schema.json",
-  "vcs": {
-    "enabled": false,
-    "clientKind": "git",
-    "useIgnoreFile": false
-  },
-  "files": {
-    "ignoreUnknown": false,
-    "includes": [
-      "**",
-      "!**/.next",
-      "!**/dist",
-      "!**/.turbo",
-      "!**/dev-dist",
-      "!**/.zed",
-      "!**/.vscode",
-      "!**/routeTree.gen.ts",
-      "!**/src-tauri",
-      "!**/.nuxt",
-      "!bts.jsonc"
-    ]
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "tab"
-  },
-  "assist": {
-    "actions": {
-      "source": {
-        "organizeImports": "off",
-        "useSortedAttributes": "off"
-      }
-    }
-  },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "suspicious": {
-        "noUnknownAtRules": "off"
-      },
-      "recommended": true,
-      "correctness": {
-        "noUnknownMediaFeatureName": "off",
-        "useExhaustiveDependencies": "info"
-      },
-      "a11y": {
-        "noSvgWithoutTitle": "warn",
-        "noAriaUnsupportedElements": "warn",
-        "noNoninteractiveElementToInteractiveRole": "warn",
-        "noPositiveTabindex": "warn",
-        "useAriaPropsForRole": "warn",
-        "useHeadingContent": "warn",
-        "useHtmlLang": "warn",
-        "useIframeTitle": "warn",
-        "useKeyWithClickEvents": "warn",
-        "useMediaCaption": "warn",
-        "useValidAnchor": "warn",
-        "useValidAriaProps": "warn",
-        "useValidAriaRole": "warn",
-        "useValidAriaValues": "warn"
-      },
-      "complexity": {
-        "noImportantStyles": "off"
-      },
-      "style": {
-        "noParameterAssign": "error",
-        "useAsConstAssertion": "error",
-        "useDefaultParameterLast": "error",
-        "useEnumInitializers": "error",
-        "useSelfClosingElements": "error",
-        "useSingleVarDeclarator": "error",
-        "noUnusedTemplateLiteral": "error",
-        "useNumberNamespace": "error",
-        "noInferrableTypes": "error",
-        "noUselessElse": "error"
-      }
-    }
-  },
-  "css": {
-    "linter": {
-      "enabled": true
-    },
-    "parser": {
-      "tailwindDirectives": true
-    }
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "double"
-    }
-  }
+	"$schema": "https://biomejs.dev/schemas/2.3.15/schema.json",
+	"vcs": {
+		"enabled": false,
+		"clientKind": "git",
+		"useIgnoreFile": false
+	},
+	"files": {
+		"ignoreUnknown": false,
+		"includes": [
+			"**",
+			"!**/.next",
+			"!**/dist",
+			"!**/.turbo",
+			"!**/dev-dist",
+			"!**/.zed",
+			"!**/.vscode",
+			"!**/routeTree.gen.ts",
+			"!**/src-tauri",
+			"!**/.nuxt",
+			"!**/*.json",
+			"!bts.jsonc"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab"
+	},
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": "off",
+				"useSortedAttributes": "off"
+			}
+		}
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"suspicious": {
+				"noUnknownAtRules": "off"
+			},
+			"recommended": true,
+			"correctness": {
+				"noUnknownMediaFeatureName": "off",
+				"useExhaustiveDependencies": "info"
+			},
+			"a11y": {
+				"noSvgWithoutTitle": "off",
+				"noAriaUnsupportedElements": "warn",
+				"noNoninteractiveElementToInteractiveRole": "warn",
+				"noPositiveTabindex": "warn",
+				"useAriaPropsForRole": "warn",
+				"useHeadingContent": "warn",
+				"useHtmlLang": "warn",
+				"useIframeTitle": "warn",
+				"useKeyWithClickEvents": "warn",
+				"useMediaCaption": "warn",
+				"useValidAnchor": "warn",
+				"useValidAriaProps": "warn",
+				"useValidAriaRole": "warn",
+				"useValidAriaValues": "warn"
+			},
+			"complexity": {
+				"noImportantStyles": "off"
+			},
+			"style": {
+				"noParameterAssign": "error",
+				"useAsConstAssertion": "error",
+				"useDefaultParameterLast": "error",
+				"useEnumInitializers": "error",
+				"useSelfClosingElements": "error",
+				"useSingleVarDeclarator": "error",
+				"noUnusedTemplateLiteral": "error",
+				"useNumberNamespace": "error",
+				"noInferrableTypes": "error",
+				"noUselessElse": "error"
+			}
+		}
+	},
+	"css": {
+		"linter": {
+			"enabled": true
+		},
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double"
+		}
+	}
 }

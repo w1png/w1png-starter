@@ -45,9 +45,11 @@ function SignInPage() {
 		validators: {
 			onSubmit: z.object({
 				email: z.email("Введите Email"),
-				password: z.string({
-          message: "Введите пароль"
-        }).min(8, "Пароль должен быть не менее 8 символов"),
+				password: z
+					.string({
+						message: "Введите пароль",
+					})
+					.min(8, "Пароль должен быть не менее 8 символов"),
 			}),
 		},
 	});
@@ -80,7 +82,7 @@ function SignInPage() {
 									onChange={(e) => field.handleChange(e.target.value)}
 									type="email"
 									value={field.state.value}
-                  errors={field.state.meta.errors.map(e => e?.message)}
+									errors={field.state.meta.errors.map((e) => e?.message)}
 								/>
 							</div>
 						)}
@@ -99,7 +101,7 @@ function SignInPage() {
 									onChange={(e) => field.handleChange(e.target.value)}
 									type="password"
 									value={field.state.value}
-                  errors={field.state.meta.errors.map(e => e?.message)}
+									errors={field.state.meta.errors.map((e) => e?.message)}
 								/>
 							</div>
 						)}

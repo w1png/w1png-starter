@@ -3,7 +3,6 @@ import {
 	type IItem,
 	YooCheckout,
 } from "@a2seven/yoo-checkout";
-import { env } from "@lunarweb/env";
 import { logger } from "@lunarweb/logger";
 
 export const paymentStatuses = [

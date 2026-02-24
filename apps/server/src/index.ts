@@ -18,9 +18,9 @@ const handler = new RPCHandler(appRouter, {
 });
 
 const _app = new Elysia()
-  .onStart(async () => {
-    await createMainAdminIfNotExists();
-  })
+	.onStart(async () => {
+		await createMainAdminIfNotExists();
+	})
 	.onError(ApiLogger)
 	.use(
 		cors({

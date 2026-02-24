@@ -48,9 +48,11 @@ function SignUpPage() {
 			onSubmit: z.object({
 				name: z.string().min(2, "Введите ваше имя"),
 				email: z.email("Введите ваш Email"),
-				password: z.string({
-          message: "Введите пароль"
-        }).min(8, "Пароль должен быть не менее 8 символов"),
+				password: z
+					.string({
+						message: "Введите пароль",
+					})
+					.min(8, "Пароль должен быть не менее 8 символов"),
 			}),
 		},
 	});

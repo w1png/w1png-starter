@@ -225,6 +225,7 @@ function CreateUpdate<R extends AdminRouterKeys, S extends ZodObject>({
 		const isFile = zodField.description?.includes("FILE");
 		const realType = getRealZodType(zodField).type;
 
+		/** biome-ignore lint/suspicious/noExplicitAny: intended */
 		type CastedValue = DeepValue<CreateInput<R>, any>;
 
 		if (isFile) {
