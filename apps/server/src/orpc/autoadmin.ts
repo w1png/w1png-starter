@@ -9,6 +9,7 @@ import {
 	getTableColumns,
 	isNull,
 	type InferInsertModel,
+	type InferSelectModel,
 } from "drizzle-orm";
 
 export function createAutoAdminRouter<
@@ -56,13 +57,13 @@ export function createAutoAdminRouter<
 			}),
 		getAll: publicProcedure.handler(async () =>
 			ServeCached([cacheKey], DEFAULT_TTL, async () => {
-				return db
+				return (await db
 					.select({
 						...getTableColumns(table),
 					})
-					.from(table)
+					.from(table as PgTable)
 					.where(isNull(table.deletedAt))
-					.orderBy(desc(table.createdAt));
+					.orderBy(desc(table.createdAt))) as InferSelectModel<TTable>[];
 			}),
 		),
 		...additionalRoutes,

@@ -1,46 +1,24 @@
-/** biome-ignore-all lint/correctness/useHookAtTopLevel: temp */
+import type { ZodObject, ZodType } from "zod/v4";
+import {
+	getRealZodType,
+	type AdminRouterKeys,
+	type AppRouter,
+	type CreateInput,
+	type GetOutput,
+} from "./types";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { orpc, queryClient } from "@/lib/orpc";
-import {
-	useForm,
-	type DeepValue,
-	type FormValidateOrFn,
-} from "@tanstack/react-form";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-	type AnyRoute,
-	type FileRoute,
-	type FileRoutesByPath,
-	type RouteConstraints,
-	useLoaderData,
-} from "@tanstack/react-router";
 import { toast } from "sonner";
-import {
-	ZodArray,
-	ZodNullable,
-	ZodOptional,
-	type ZodObject,
-	type ZodType,
-} from "zod/v4";
-import {
-	Dashboard,
-	DashboardContent,
-	DashboardHeader,
-	DashboardTitle,
-} from "./ui/dashboard";
-import { DataTable } from "./ui/data-table";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import {
-	EllipsisVertical,
-	PlusIcon,
-	SquarePenIcon,
-	Trash,
-	TrashIcon,
-} from "lucide-react";
+import { useForm, type FormValidateOrFn } from "@tanstack/react-form";
+import type { DeepValue } from "@tanstack/react-table";
+import { FileInput } from "../ui/image-input";
+import { Input } from "../ui/input";
+import { PlusIcon, SquarePenIcon, TrashIcon } from "lucide-react";
+import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
+import Errors from "../ui/errors";
+import { DatePicker } from "../ui/date-picker";
 import {
 	Dialog,
 	DialogClose,
@@ -50,122 +28,21 @@ import {
 	DialogInnerContent,
 	DialogTitle,
 	DialogTrigger,
-} from "./ui/dialog";
-import { useState } from "react";
-import { Button } from "./ui/button";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
+} from "../ui/dialog";
+import { DropdownMenuItem } from "../ui/dropdown-menu";
+import { Label } from "../ui/label";
 
-import { FileInput } from "./ui/image-input";
-import { Checkbox } from "./ui/checkbox";
-import { DatePicker } from "./ui/date-picker";
-import Errors from "./ui/errors";
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger,
-} from "./ui/alert-dialog";
-
-type HasAdminMethods<T> = T extends {
-	getAll: unknown;
-	create: unknown;
-	update: unknown;
-	delete: unknown;
-}
-	? true
-	: false;
-
-type AppRouter = typeof orpc;
-
-type AdminRouterKeys = {
-	[K in keyof AppRouter]: HasAdminMethods<AppRouter[K]> extends true
-		? K
-		: never;
-}[keyof AppRouter];
-
-type CreateInput<T extends AdminRouterKeys> = Parameters<
-	AppRouter[T]["create"]["call"]
->["0"];
-
-function Delete({
-	value,
-	router: routerKey,
-}: {
-	value: Awaited<
-		ReturnType<(typeof orpc)[AdminRouterKeys]["getAll"]["call"]>
-	>[number];
-	router: AdminRouterKeys;
-}) {
-	const [open, setOpen] = useState(false);
-
-	const router = orpc[routerKey];
-	const deleteMutation = useMutation(
-		router.delete.mutationOptions({
-			onSuccess: async () => {
-				toast.success("Удалено");
-				await queryClient.invalidateQueries({
-					queryKey: router.getAll.key(),
-				});
-				setOpen(false);
-			},
-		}),
-	);
-
-	return (
-		<AlertDialog open={open} onOpenChange={setOpen}>
-			<AlertDialogTrigger asChild>
-				<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-					<Trash />
-					<span>Удалить</span>
-				</DropdownMenuItem>
-			</AlertDialogTrigger>
-			<AlertDialogContent>
-				<AlertDialogHeader>
-					<AlertDialogTitle>Удалить занятие?</AlertDialogTitle>
-				</AlertDialogHeader>
-				<AlertDialogFooter>
-					<AlertDialogCancel>Отмена</AlertDialogCancel>
-					<AlertDialogAction asChild>
-						<Button
-							loading={deleteMutation.isPending}
-							onClick={() => {
-								deleteMutation.mutate({ id: value.id });
-							}}
-						>
-							Удалить
-						</Button>
-					</AlertDialogAction>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		</AlertDialog>
-	);
-}
-
-function getRealZodType(zodType: ZodType) {
-	if (zodType instanceof ZodNullable || zodType instanceof ZodOptional) {
-		return getRealZodType(zodType.unwrap() as ZodType);
-	}
-
-	if (zodType instanceof ZodArray) {
-		return getRealZodType(zodType.element as ZodType);
-	}
-
-	return zodType;
-}
-
-function CreateUpdate<R extends AdminRouterKeys, S extends ZodObject>({
+export function AutoAdminCreateUpdate<
+	R extends AdminRouterKeys,
+	S extends ZodObject,
+>({
 	schema,
 	router: routerKey,
 	value,
 }: {
 	schema: S & { _output: CreateInput<R> };
 	router: R;
-	value?: Awaited<ReturnType<(typeof orpc)[R]["getAll"]["call"]>>[number];
+	value?: GetOutput<R>;
 }) {
 	const [open, setOpen] = useState(false);
 
@@ -442,106 +319,4 @@ function CreateUpdate<R extends AdminRouterKeys, S extends ZodObject>({
 			</DialogContent>
 		</Dialog>
 	);
-}
-
-export default function AutoAdmin<
-	R extends AdminRouterKeys,
-	S extends ZodObject,
-	TFilePath extends keyof FileRoutesByPath,
-	TParentRoute extends AnyRoute = FileRoutesByPath[TFilePath]["parentRoute"],
-	TId extends RouteConstraints["TId"] = FileRoutesByPath[TFilePath]["id"],
-	TPath extends RouteConstraints["TPath"] = FileRoutesByPath[TFilePath]["path"],
-	TFullPath extends
-		RouteConstraints["TFullPath"] = FileRoutesByPath[TFilePath]["fullPath"],
->({
-	schema,
-	router: routerKey,
-	header,
-}: {
-	header: string;
-	router: R;
-	schema: S & {
-		_output: CreateInput<R> &
-			(
-				| {
-						title: string;
-						name?: never;
-				  }
-				| {
-						name: string;
-						title?: never;
-				  }
-			);
-	};
-}): Parameters<
-	FileRoute<TFilePath, TParentRoute, TId, TPath, TFullPath>["createRoute"]
->[0] {
-	const router = orpc[routerKey];
-
-	return {
-		loader: async () => {
-			return {
-				data: await router.getAll.call(),
-			};
-		},
-		component: () => {
-			const {
-				data: initialData,
-			}: {
-				data: Awaited<ReturnType<typeof router.getAll.call>>;
-			} = useLoaderData({
-				strict: false,
-			});
-
-			const { data } = useQuery(
-				router.getAll.queryOptions({
-					initialData,
-				}),
-			);
-
-			return (
-				<Dashboard>
-					<DashboardHeader>
-						<DashboardTitle>{header}</DashboardTitle>
-					</DashboardHeader>
-					<DashboardContent>
-						<DataTable
-							columns={[
-								{
-									accessorKey: schema.shape?.name ? "name" : "title",
-									header: "Название",
-								},
-								{
-									id: "actions",
-									header: () => (
-										<div className="flex justify-end">
-											<CreateUpdate schema={schema} router={routerKey} />
-										</div>
-									),
-									cell: ({ row }) => (
-										<div className="flex justify-end">
-											<DropdownMenu>
-												<DropdownMenuTrigger>
-													<EllipsisVertical />
-												</DropdownMenuTrigger>
-												<DropdownMenuContent>
-													<CreateUpdate
-														value={row.original}
-														schema={schema}
-														router={routerKey}
-													/>
-													<Delete value={row.original} router={routerKey} />
-												</DropdownMenuContent>
-											</DropdownMenu>
-										</div>
-									),
-								},
-							]}
-							data={data}
-						/>
-					</DashboardContent>
-				</Dashboard>
-			);
-		},
-	};
 }
