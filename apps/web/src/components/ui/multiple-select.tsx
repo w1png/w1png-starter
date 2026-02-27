@@ -12,13 +12,9 @@ import {
 	CommandList,
 } from "./command";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import type { Item } from "@/lib/types/utils";
 
-type Item = {
-	id: string;
-	name: string;
-};
-
-export default function MultpleSelect<T extends Item>({
+export default function MultipleSelect<T extends Item>({
 	values,
 	value,
 	onChange,

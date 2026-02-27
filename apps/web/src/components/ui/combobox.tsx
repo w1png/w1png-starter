@@ -10,11 +10,7 @@ import {
 } from "./command";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { cn } from "@/lib/utils";
-
-type Item = {
-	id: string;
-	name: string;
-};
+import type { Item } from "@/lib/types/utils";
 
 export default function Combobox<T extends Item>({
 	values,

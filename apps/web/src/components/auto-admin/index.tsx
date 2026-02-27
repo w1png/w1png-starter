@@ -9,7 +9,7 @@ import {
 	useLoaderData,
 } from "@tanstack/react-router";
 import type { ZodObject } from "zod/v4";
-import type { AdminRouterKeys, CreateInput } from "./types";
+import type { AdminRouterKeys, CreateInput, FieldConfigs } from "./types";
 import {
 	Dashboard,
 	DashboardContent,
@@ -29,6 +29,7 @@ import { AutoAdminDelete } from "./delete";
 export default function AutoAdmin<
 	R extends AdminRouterKeys,
 	S extends ZodObject,
+	CFG extends FieldConfigs<S>,
 	TFilePath extends keyof FileRoutesByPath,
 	TParentRoute extends AnyRoute = FileRoutesByPath[TFilePath]["parentRoute"],
 	TId extends RouteConstraints["TId"] = FileRoutesByPath[TFilePath]["id"],
@@ -39,6 +40,7 @@ export default function AutoAdmin<
 	schema,
 	router: routerKey,
 	header,
+	config,
 }: {
 	header: string;
 	router: R;
@@ -55,6 +57,7 @@ export default function AutoAdmin<
 				  }
 			);
 	};
+	config?: CFG;
 }): Parameters<
 	FileRoute<TFilePath, TParentRoute, TId, TPath, TFullPath>["createRoute"]
 >[0] {
@@ -100,6 +103,7 @@ export default function AutoAdmin<
 											<AutoAdminCreateUpdate
 												schema={schema}
 												router={routerKey}
+												config={config}
 											/>
 										</div>
 									),
@@ -110,15 +114,22 @@ export default function AutoAdmin<
 													<EllipsisVertical />
 												</DropdownMenuTrigger>
 												<DropdownMenuContent>
-													<AutoAdminCreateUpdate
-														value={row.original}
-														schema={schema}
-														router={routerKey}
-													/>
-													<AutoAdminDelete
-														value={row.original}
-														router={routerKey}
-													/>
+													{config?.actions?.update !== false && (
+														<AutoAdminCreateUpdate
+															value={row.original}
+															schema={schema}
+															router={routerKey}
+														/>
+													)}
+
+													{config?.actions?.delete !== false && (
+														<AutoAdminDelete
+															value={row.original}
+															router={routerKey}
+														/>
+													)}
+
+													{config?.actions?.additionalActions}
 												</DropdownMenuContent>
 											</DropdownMenu>
 										</div>
