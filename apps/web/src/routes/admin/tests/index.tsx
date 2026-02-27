@@ -8,14 +8,15 @@ export const Route = createFileRoute("/admin/tests/")(
 		router: "tests",
 		header: "тест",
 		config: {
-			// actions: {
-			// 	delete: false,
-			// 	update: false,
-			// },
+			actions: {
+				delete: true,
+				update: false,
+				additionalActions: ["hello world!"],
+			},
 			fields: {
 				bool: {
 					label: "Логическое поле",
-					type: "switch",
+					type: "checkbox",
 					placeholder: "Я согласен с чем-то",
 				},
 				name: {

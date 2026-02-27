@@ -11,6 +11,7 @@ import {
 	type InferInsertModel,
 	type InferSelectModel,
 } from "drizzle-orm";
+import type { AnyProcedure } from "@orpc/server";
 
 export function createAutoAdminRouter<
 	TTable extends PgTable & {
@@ -22,19 +23,19 @@ export function createAutoAdminRouter<
 	TSchema extends ZodObject & {
 		_output: InferInsertModel<TTable>;
 	},
-	TAdditionalRoutes extends object,
+	TAdditionalRoutes extends Record<string, AnyProcedure>,
 >({
 	schema,
 	table,
 	cacheKey,
-	additionalRoutes,
+	additionalRoutes = {} as TAdditionalRoutes,
 }: {
 	schema: TSchema;
 	table: TTable;
 	cacheKey: string;
 	additionalRoutes?: TAdditionalRoutes;
 }) {
-	return {
+	const router = {
 		create: protectedProcedure.input(schema).handler(async ({ input }) => {
 			await db.insert(table).values(input);
 			await InvalidateCached([cacheKey]);
@@ -68,4 +69,6 @@ export function createAutoAdminRouter<
 		),
 		...additionalRoutes,
 	};
+
+	return router as typeof router & TAdditionalRoutes;
 }
