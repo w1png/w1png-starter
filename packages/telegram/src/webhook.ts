@@ -1,25 +1,19 @@
-import { env } from "@lunarweb/env";
-import { bot } from ".";
+import "dotenv/config";
+import { Telegram } from ".";
 
-async function Webhook() {
-	const del = await bot.api.deleteWebhook();
-	const set = await bot.api.setWebhook(`${env.BACKEND_URL}/api/telegram`, {
-		allowed_updates: [
-			"chat_member",
-			"message",
-			"inline_query",
-			"callback_query",
-			"shipping_query",
-			"pre_checkout_query",
-			"shipping_query",
-		],
+async function main() {
+	const telegram = new Telegram({
+		botToken: process.env.TELEGRAM_BOT_TOKEN ?? "",
+		frontendUrl: process.env.FRONTEND_URL ?? "",
+		logger: console,
 	});
-	const get = await bot.api.getWebhookInfo();
-
-	console.log({ del, set, get });
+	const webhook = await telegram.configureWebhook(
+		process.env.BACKEND_URL ?? "",
+	);
+	console.log(webhook);
 }
 
-Webhook()
+main()
 	.then(() => {
 		process.exit(0);
 	})

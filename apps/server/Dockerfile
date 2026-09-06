@@ -1,30 +1,26 @@
-ARG BUN_VERSION=1.3.8
+# syntax=docker/dockerfile:1.7
+ARG BUN_VERSION=1.4.2
 FROM oven/bun:${BUN_VERSION} AS base
+WORKDIR /app
 
 FROM base AS pruner
-WORKDIR /app
 COPY . .
-RUN bunx turbo prune server --docker
+RUN bunx turbo@2.8.8 prune server --docker
 
-FROM base AS installer
-WORKDIR /app
-COPY --from=pruner /app/out/json ./
+FROM base AS dependencies
+COPY --from=pruner /app/out/json/ ./
 COPY --from=pruner /app/out/bun.lock ./bun.lock
-COPY --from=pruner /app/out/full ./out/full
-COPY packages /app/packages
-COPY apps/server/src ./apps/server/src
-COPY turbo.json ./turbo.json
-RUN bun install
+RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile
 
-FROM base AS builder
-WORKDIR /app
-COPY --from=installer /app ./
-RUN bun run --filter="@lunarweb/*" build
+FROM dependencies AS builder
+COPY --from=pruner /app/out/full/ ./
+RUN bun run --cwd apps/server build
 
-FROM base
+FROM oven/bun:${BUN_VERSION}-slim AS runtime
 WORKDIR /app
-COPY --from=builder /app/apps/server ./apps/server
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/packages ./packages
+ENV NODE_ENV=production
+COPY --from=builder --chown=bun:bun /app/apps/server/dist/index.js ./index.js
+USER bun
 EXPOSE 3000
-CMD ["bun", "run", "--filter=server", "start"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s CMD bun -e 'fetch("http://localhost:" + (process.env.PORT || 3000) + "/health").then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))'
+CMD ["bun", "index.js"]

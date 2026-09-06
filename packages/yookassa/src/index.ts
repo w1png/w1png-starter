@@ -3,7 +3,6 @@ import {
 	type IItem,
 	YooCheckout,
 } from "@a2seven/yoo-checkout";
-import { logger } from "@lunarweb/logger";
 
 export const paymentStatuses = [
 	"pending",
@@ -12,15 +11,19 @@ export const paymentStatuses = [
 	"canceled",
 ] as const;
 
-export class Yookassa {
-	private yookassa: YooCheckout;
+export interface YookassaLogger {
+	info(event: unknown): unknown;
+	error(event: unknown): unknown;
+}
 
-	constructor() {
-		this.yookassa = new YooCheckout({
-			shopId: process.env.YOOKASSA_SHOP_ID ?? "",
-			secretKey: process.env.YOOKASSA_SECRET_KEY ?? "",
-		});
-	}
+export class Yookassa {
+	constructor(
+		private readonly dependencies: {
+			client: YooCheckout;
+			logger: YookassaLogger;
+			createId?: () => string;
+		},
+	) {}
 
 	async createPayment({
 		amount,
@@ -29,14 +32,15 @@ export class Yookassa {
 		amount: number;
 		redirectPath: string;
 	}) {
-		const idempotencyKey = Bun.randomUUIDv7();
+		const idempotencyKey =
+			this.dependencies.createId?.() ?? crypto.randomUUID();
 		try {
-			logger.info({
+			this.dependencies.logger.info({
 				message: "Creating payment",
 				amount,
 				redirectPath,
 			});
-			const yookassaPayment = await this.yookassa.createPayment(
+			const yookassaPayment = await this.dependencies.client.createPayment(
 				{
 					amount: {
 						value: amount.toFixed(0).toString(),
@@ -50,13 +54,13 @@ export class Yookassa {
 				},
 				idempotencyKey,
 			);
-			logger.info({
+			this.dependencies.logger.info({
 				message: "Payment created",
 				id: yookassaPayment.id,
 			});
 			const confirmationUrl = yookassaPayment.confirmation.confirmation_url;
 			if (!confirmationUrl) {
-				logger.error({
+				this.dependencies.logger.error({
 					message: "Payment confirmation url is not found",
 				});
 				throw new Error("Не удалось создать платеж");
@@ -64,7 +68,7 @@ export class Yookassa {
 
 			return { yookassaPayment, idempotencyKey };
 		} catch (error) {
-			logger.error({
+			this.dependencies.logger.error({
 				message: "Payment failed",
 				error,
 			});
@@ -84,7 +88,7 @@ export class Yookassa {
 		amount: number;
 		customer: ICheckoutCustomer;
 	}) {
-		const receipt = await this.yookassa.createReceipt({
+		const receipt = await this.dependencies.client.createReceipt({
 			send: true,
 			payment_id: paymentId,
 			type: "payment",
@@ -101,14 +105,16 @@ export class Yookassa {
 			],
 		});
 
-		console.log(receipt);
-
 		return receipt.id;
 	}
 }
 
-const globalForYookassa = globalThis as unknown as {
-	yookassa: Yookassa;
-};
-
-export const yookassa = globalForYookassa.yookassa ?? new Yookassa();
+export function createYookassaClient({
+	shopId,
+	secretKey,
+}: {
+	shopId: string;
+	secretKey: string;
+}) {
+	return new YooCheckout({ shopId, secretKey });
+}

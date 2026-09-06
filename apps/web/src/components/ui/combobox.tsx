@@ -76,7 +76,7 @@ export default function Combobox<T extends Item>({
 											onChange(v);
 											setOpen(false);
 										}}
-										value={v.name}
+										value={v.name ?? v.id}
 									>
 										{v.name}
 										<Check

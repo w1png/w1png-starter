@@ -1,47 +1,36 @@
-import { GetFileMetadata, s3, UploadFile } from "@lunarweb/files";
 import { Elysia } from "elysia";
-import z from "zod/v4";
+import { z } from "zod";
+import { MAX_FILE_SIZE, type FileService } from "./service";
 
-export const fileRouter = new Elysia({ prefix: "/file" })
-	.get("/:id", async ({ params, set }) => {
-		const meta = await GetFileMetadata(params.id);
-
-		set.headers["Content-Type"] = meta.contentType;
-		set.headers["Content-Disposition"] =
-			`attachment; filename="${encodeURIComponent(meta.name)}"`;
-
-		const s3File = s3.file(meta.id);
-
-		return new Response(s3File.stream(), {
-			headers: {
-				"Content-Type": meta.contentType,
-				"Content-Disposition": `attachment; filename="${encodeURIComponent(meta.name)}"`,
-			},
-		});
-	})
-	.get("/:id/data", async ({ params }) => {
-		const meta = await GetFileMetadata(params.id);
-		const s3File = s3.file(meta.id);
-
-		return {
-			contentType: meta.contentType,
-			name: meta.name,
-			size: (await s3File.stat()).size,
-		};
-	})
-
-	.post(
-		"/",
-		async ({ body }) => {
-			return {
-				id: await UploadFile({
-					file: body.file,
-				}),
-			};
-		},
-		{
-			body: z.object({
-				file: z.file(),
-			}),
-		},
-	);
+export class FileRouter {
+	readonly http;
+	constructor({ fileService }: { fileService: FileService }) {
+		this.http = new Elysia({ prefix: "/file" })
+			.get("/:id", async ({ params, status }) => {
+				const meta = await fileService.metadata(params.id);
+				if (!meta) return status(404, "File not found");
+				return new Response(fileService.stream(meta.id), {
+					headers: {
+						"Content-Type": meta.contentType,
+						"Content-Disposition": `attachment; filename="${encodeURIComponent(meta.name)}"`,
+					},
+				});
+			})
+			.get("/:id/data", async ({ params, status }) => {
+				const meta = await fileService.metadata(params.id);
+				if (!meta) return status(404, "File not found");
+				return {
+					contentType: meta.contentType,
+					name: meta.name,
+					size: meta.size,
+				};
+			})
+			.post(
+				"/",
+				async ({ body }) => ({ id: await fileService.upload(body.file) }),
+				{
+					body: z.compile(z.object({ file: z.file().max(MAX_FILE_SIZE) })),
+				},
+			);
+	}
+}

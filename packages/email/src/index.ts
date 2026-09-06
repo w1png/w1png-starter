@@ -1,23 +1,19 @@
-import { logger } from "@lunarweb/logger";
 import { render } from "@react-email/render";
 import nodemailer from "nodemailer";
 import type { ReactElement } from "react";
 
-export class Email {
-	private transporter: nodemailer.Transporter;
+export interface EmailLogger {
+	error(error: unknown): unknown;
+}
 
-	constructor() {
-		this.transporter = nodemailer.createTransport();
-		// {
-		// 			host: process.env.EMAIL_HOST,
-		// 			port: process.env.EMAIL_PORT,
-		// 			secure: true,
-		// 			auth: {
-		// 				user: process.env.EMAIL_USER,
-		// 				pass: process.env.EMAIL_PASSWORD,
-		// 			},
-		// 		}
-	}
+export class Email {
+	constructor(
+		private readonly dependencies: {
+			from: string;
+			logger: EmailLogger;
+			transporter: nodemailer.Transporter;
+		},
+	) {}
 
 	async send({
 		body,
@@ -29,20 +25,18 @@ export class Email {
 		to: string;
 	}) {
 		try {
-			this.transporter.sendMail({
-				from: process.env.EMAIL_USER,
+			await this.dependencies.transporter.sendMail({
+				from: this.dependencies.from,
 				to,
-				subject: subject,
+				subject,
 				html: await render(body),
 			});
 		} catch (error) {
-			logger.error({ error, to, subject });
+			this.dependencies.logger.error({ error, to, subject });
 		}
 	}
 }
 
-const globalForEmail = globalThis as unknown as {
-	email: Email | undefined;
-};
-
-export const email = globalForEmail.email ?? new Email();
+export function createEmailTransport(options?: nodemailer.TransportOptions) {
+	return nodemailer.createTransport(options);
+}
