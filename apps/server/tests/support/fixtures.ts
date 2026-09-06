@@ -5,8 +5,8 @@ import {
 	createTestsTable,
 	createFilesTable,
 } from "@lunarweb/database/schema";
-import { Context } from "../src/context";
-import { Env } from "../src/env";
+import { Context } from "../../src/context";
+import { Env } from "../../src/env";
 import { Logger } from "@lunarweb/logger";
 import { Redis } from "@lunarweb/redis";
 

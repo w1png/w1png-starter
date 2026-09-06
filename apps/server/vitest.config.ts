@@ -28,7 +28,7 @@ export default defineConfig({
 		environment: "node",
 		globals: false,
 		reporters: ["dot"],
-		globalSetup: ["./tests/global-setup.ts"],
+		globalSetup: ["./tests/support/global-setup.ts"],
 		include: ["tests/**/*.test.ts"],
 		maxWorkers: 2,
 		testTimeout: 15000,

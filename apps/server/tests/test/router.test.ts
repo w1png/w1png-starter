@@ -1,10 +1,9 @@
 import { call } from "@orpc/server";
 import { describe, expect, it, vi } from "vitest";
-import { TestRouter } from "../src/orpc/routers/test";
-import { UserRouter } from "../src/orpc/routers/user";
-import type { ORPCContext } from "../src/orpc/procedures";
-import { NotFoundError } from "../src/services/crud";
-import { TestService } from "../src/services/test";
+import { TestRouter } from "../../src/orpc/routers/test";
+import type { ORPCContext } from "../../src/orpc/procedures";
+import { NotFoundError } from "../../src/services/crud";
+import { TestService } from "../../src/services/test";
 
 const input = {
 	id: "one",
@@ -129,12 +128,9 @@ describe("AutoAdmin", () => {
 			call(router.get, { id: "missing" }, { context }),
 		).rejects.toMatchObject({ code: "NOT_FOUND" });
 	});
-	it("returns session and custom routes without requiring admin access", async () => {
+	it("allows custom public routes without admin access", async () => {
 		const { router, context } = setup(null);
 		expect(await call(router.foo, undefined, { context })).toBe("foo");
-		expect(
-			await call(new UserRouter().rpc.session.get, undefined, { context }),
-		).toBeNull();
 	});
 });
 

@@ -2,7 +2,7 @@ import { PostgreSqlContainer } from "@testcontainers/postgresql";
 import { RedisContainer } from "@testcontainers/redis";
 import type { TestProject } from "vitest/node";
 
-export default async function setup(project: TestProject) {
+export default async function setupTestContainers(project: TestProject) {
 	const postgres = await new PostgreSqlContainer("postgres:17-alpine").start();
 	try {
 		const redis = await new RedisContainer("redis:8-alpine").start();

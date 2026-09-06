@@ -1,6 +1,6 @@
 import { expect, vi } from "vitest";
 import { FileService, MAX_FILE_SIZE } from "@lunarweb/files";
-import { test } from "./fixtures";
+import { test } from "../support/fixtures";
 
 function storageDouble() {
 	const object = { write: vi.fn(), stream: vi.fn(), stat: vi.fn() };
