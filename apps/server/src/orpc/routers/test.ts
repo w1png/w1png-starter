@@ -1,15 +1,23 @@
-import { TestSchema } from "@lunarweb/shared/schemas";
-import { tests } from "@lunarweb/database/schema";
-import { createAutoAdminRouter } from "../autoadmin";
-import { publicProcedure } from "../orpc";
+import { TestSchema, UpdateTestSchema } from "@lunarweb/shared/schemas";
+import type { Context } from "../../context";
+import type { TestEntity } from "../../services/test";
+import { TestService } from "../../services/test";
+import { AutoAdmin } from "../autoadmin";
+import { publicProcedure } from "../procedures";
 
-export const testRouter = createAutoAdminRouter({
-	schema: TestSchema,
-	table: tests,
-	cacheKey: "test",
-	additionalRoutes: {
-		foo: publicProcedure.handler(async () => {
-			return "foo";
-		}),
-	},
-});
+export class TestRouter extends AutoAdmin<
+	typeof TestSchema,
+	typeof UpdateTestSchema,
+	TestEntity,
+	TestService
+> {
+	constructor({ context }: { context: Context }) {
+		super({
+			context,
+			createSchema: TestSchema,
+			updateSchema: UpdateTestSchema,
+			Service: TestService,
+		});
+	}
+	readonly rpc = { ...this.router, foo: publicProcedure.handler(() => "foo") };
+}

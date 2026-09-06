@@ -82,7 +82,7 @@ export function AutoAdminCreateUpdate<
 		onSubmit: ({ value: data }) => {
 			if (value) {
 				updateMutation.mutate({
-					...data,
+					data,
 					id: value.id,
 				});
 			} else {

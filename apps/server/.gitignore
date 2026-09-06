@@ -34,6 +34,7 @@ node_modules/
 .dev.vars
 
 # logs
+test-results/
 logs/
 *.log
 npm-debug.log*

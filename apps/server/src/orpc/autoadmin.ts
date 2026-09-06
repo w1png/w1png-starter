@@ -1,74 +1,58 @@
-import { db } from "@lunarweb/database";
-import { protectedProcedure, publicProcedure } from "./orpc";
-import { DEFAULT_TTL, InvalidateCached, ServeCached } from "@lunarweb/redis";
-import { z, type ZodObject } from "zod/v4";
-import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
-import {
-	desc,
-	eq,
-	getTableColumns,
-	isNull,
-	type InferInsertModel,
-	type InferSelectModel,
-} from "drizzle-orm";
-import type { AnyProcedure } from "@orpc/server";
+import type { InferSchemaOutput } from "@orpc/server";
+import { z } from "zod";
+import type { Context } from "../context";
+import type { CrudService } from "../services/crud";
+import { adminProcedure } from "./procedures";
 
-export function createAutoAdminRouter<
-	TTable extends PgTable & {
-		id: PgColumn;
-		serial: PgColumn;
-		deletedAt: PgColumn;
-		createdAt: PgColumn;
-	},
-	TSchema extends ZodObject & {
-		_output: InferInsertModel<TTable>;
-	},
-	TAdditionalRoutes extends Record<string, AnyProcedure>,
->({
-	schema,
-	table,
-	cacheKey,
-	additionalRoutes = {} as TAdditionalRoutes,
-}: {
-	schema: TSchema;
-	table: TTable;
-	cacheKey: string;
-	additionalRoutes?: TAdditionalRoutes;
-}) {
-	const router = {
-		create: protectedProcedure.input(schema).handler(async ({ input }) => {
-			await db.insert(table).values(input);
-			await InvalidateCached([cacheKey]);
-		}),
-		update: protectedProcedure
-			.input(schema.extend({ id: z.string() }))
-			.handler(async ({ input }) => {
-				await db.update(table).set(input).where(eq(table.id, input.id));
-				await InvalidateCached([cacheKey]);
-			}),
-		delete: protectedProcedure
-			.input(
-				z.object({
-					id: z.string(),
+const idSchema = z.compile(z.object({ id: z.string().min(1) }));
+
+export class AutoAdmin<
+	Create extends z.ZodType,
+	Update extends z.ZodType,
+	Entity,
+	Service extends CrudService<
+		InferSchemaOutput<Create>,
+		InferSchemaOutput<Update>,
+		Entity
+	>,
+> {
+	readonly service: Service;
+	readonly router;
+	constructor({
+		context,
+		createSchema,
+		updateSchema,
+		Service,
+	}: {
+		context: Context;
+		createSchema: Create;
+		updateSchema: Update;
+		Service: new ({ context }: { context: Context }) => Service;
+	}) {
+		this.service = new Service({ context });
+		this.router = {
+			create: adminProcedure
+				.input(z.compile(createSchema))
+				.handler(({ input }) => this.service.create(input)),
+			update: adminProcedure
+				.input(
+					z.compile(z.object({ id: z.string().min(1), data: updateSchema })),
+				)
+				.handler(({ input }) => {
+					// Zod cannot simplify generic object outputs; the enclosing schema validates both fields.
+					const update = input as {
+						id: string;
+						data: InferSchemaOutput<Update>;
+					};
+					return this.service.update(update.id, update.data);
 				}),
-			)
-			.handler(async ({ input }) => {
-				await db.delete(table).where(eq(table.id, input.id));
-				await InvalidateCached([cacheKey]);
-			}),
-		getAll: publicProcedure.handler(async () =>
-			ServeCached([cacheKey], DEFAULT_TTL, async () => {
-				return (await db
-					.select({
-						...getTableColumns(table),
-					})
-					.from(table as PgTable)
-					.where(isNull(table.deletedAt))
-					.orderBy(desc(table.createdAt))) as InferSelectModel<TTable>[];
-			}),
-		),
-		...additionalRoutes,
-	};
-
-	return router as typeof router & TAdditionalRoutes;
+			delete: adminProcedure
+				.input(idSchema)
+				.handler(({ input }) => this.service.delete(input.id)),
+			get: adminProcedure
+				.input(idSchema)
+				.handler(({ input }) => this.service.get(input.id)),
+			getAll: adminProcedure.handler(() => this.service.getAll()),
+		};
+	}
 }

@@ -1,45 +1,37 @@
-import { ORPCError, os } from "@orpc/server";
-import type { ORPCContext } from "./context";
-import { logger } from "@lunarweb/logger";
-import type { UserRole } from "@lunarweb/shared/schemas";
+import { RPCHandler } from "@orpc/server/fetch";
+import { ResponseHeadersPlugin } from "@orpc/server/plugins";
+import type { Auth } from "../auth";
+import type { Context } from "../context";
+import type { TestRouter } from "./routers/test";
+import type { UserRouter } from "./routers/user";
 
-export const o = os.$context<ORPCContext>();
-
-const errorLogger = o.middleware(async ({ context, next }) => {
-	try {
-		return await next({ context });
-	} catch (error) {
-		logger.error(error);
-		throw error;
-	}
-});
-
-export const publicProcedure = o.use(errorLogger);
-
-const requireAuth = o.middleware(async ({ context, next }) => {
-	if (!context.session?.user) {
-		throw new ORPCError("UNAUTHORIZED");
-	}
-	return next({
-		context: {
-			session: context.session,
+export class ORPC {
+	readonly router;
+	readonly handler;
+	constructor(
+		private readonly dependencies: {
+			context: Context;
+			auth: Auth;
+			testRouter: TestRouter;
+			userRouter: UserRouter;
 		},
-	});
-});
-
-export const roleProcedure = (roles: UserRole[]) => {
-	return protectedProcedure.use(async ({ context, next, path }) => {
-		if (!roles.includes(context.session.user.role)) {
-			throw new ORPCError("FORBIDDEN", {
-				message: `User has role: ${context.session.user.role} but ${roles.join(", ")} are required for ${path.join(".")}`,
-			});
-		}
-		return next({
-			context: {
-				session: context.session,
-			},
+	) {
+		this.router = {
+			tests: dependencies.testRouter.rpc,
+			users: dependencies.userRouter.rpc,
+		};
+		this.handler = new RPCHandler(this.router, {
+			plugins: [new ResponseHeadersPlugin()],
 		});
-	});
-};
-
-export const protectedProcedure = publicProcedure.use(requireAuth);
+	}
+	async handle(request: Request) {
+		const session = await this.dependencies.auth.auth.api.getSession({
+			headers: request.headers,
+		});
+		const { response } = await this.handler.handle(request, {
+			prefix: "/rpc",
+			context: { session, logger: this.dependencies.context.logger },
+		});
+		return response ?? new Response("Not Found", { status: 404 });
+	}
+}

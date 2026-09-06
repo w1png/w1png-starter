@@ -1,37 +1,29 @@
-ARG BUN_VERSION=1.3.8
+# syntax=docker/dockerfile:1.7
+ARG BUN_VERSION=1.4.2
 FROM oven/bun:${BUN_VERSION} AS base
+WORKDIR /app
 
-# Pruner stage
 FROM base AS pruner
-WORKDIR /app
 COPY . .
-RUN bunx turbo prune web --docker
+RUN bunx turbo@2.8.8 prune web --docker
 
-# Installer stage
-FROM base AS installer
-WORKDIR /app
-COPY --from=pruner /app/out/json ./
+FROM base AS dependencies
+COPY --from=pruner /app/out/json/ ./
 COPY --from=pruner /app/out/bun.lock ./bun.lock
-COPY packages ./packages
-COPY apps/server ./apps/server
-RUN bun install
+RUN --mount=type=cache,target=/root/.bun/install/cache bun install --frozen-lockfile
 
-# Builder stage
-FROM base AS builder
-WORKDIR /app
+FROM dependencies AS builder
 ARG VITE_SERVER_URL
 ENV VITE_SERVER_URL=$VITE_SERVER_URL
 ARG VITE_SERVER_URL_INTERNAL
 ENV VITE_SERVER_URL_INTERNAL=$VITE_SERVER_URL_INTERNAL
-COPY --from=installer /app ./
-COPY --from=pruner /app/out/full ./
-RUN bunx turbo run build --filter=web
+COPY --from=pruner /app/out/full/ ./
+RUN --mount=type=cache,target=/app/.turbo bunx turbo run build --filter=web
 
-# Final stage
-FROM base
+FROM oven/bun:${BUN_VERSION}-slim AS runtime
 WORKDIR /app
-COPY --from=builder /app/apps/web/.output ./.output
-COPY --from=builder /app/apps/web/package.json ./
+ENV NODE_ENV=production
+COPY --from=builder --chown=bun:bun /app/apps/web/.output ./.output
+USER bun
 EXPOSE 3000
-CMD ["bun", "run", ".output/server/index.mjs"]
-# CMD ["bun", "run", "vite", "preview", "--port", "3001", "--host"]
+CMD ["bun", ".output/server/index.mjs"]

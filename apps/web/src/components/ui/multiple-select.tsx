@@ -75,7 +75,7 @@ export default function MultipleSelect<T extends Item>({
 										<CommandItem
 											key={v.id}
 											onSelect={() => handleSelect(v)}
-											value={v.name}
+											value={v.name ?? v.id}
 										>
 											<Check
 												className={cn(

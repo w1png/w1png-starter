@@ -10,7 +10,7 @@ export const commonFields = {
 		.varchar("id", { length: 255 })
 		.notNull()
 		.primaryKey()
-		.$defaultFn(() => Bun.randomUUIDv7()),
+		.$defaultFn(() => crypto.randomUUID()),
 	serial: pg.serial("serial").notNull(),
 	createdAt: pg.timestamp("created_at").notNull().defaultNow(),
 	updatedAt: pg

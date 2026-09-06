@@ -106,7 +106,7 @@ export function FilterableHeader<
 }) {
 	const search = useSearch({
 		strict: false,
-	});
+	}) as Record<string, unknown>;
 	const navigate = useNavigate();
 	const val = search[searchKey] as string[] | null | undefined;
 
@@ -156,7 +156,7 @@ export function SortableHeader<TData, TValue>({
 	const navigate = useNavigate();
 	const search = useSearch({
 		strict: false,
-	});
+	}) as Record<string, unknown>;
 	const val = search[searchKey];
 
 	useEffect(() => {
@@ -193,7 +193,7 @@ export function SortableHeader<TData, TValue>({
 export function ResetFiltersButton() {
 	const search = useSearch({
 		strict: false,
-	});
+	}) as Record<string, unknown>;
 	const navigate = useNavigate();
 
 	if (Object.values(search).length === 0 || Object.keys(search).length === 0)

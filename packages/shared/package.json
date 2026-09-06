@@ -11,10 +11,12 @@
 	"exports": {
 		"./schemas": {
 			"types": "./src/schemas/index.ts",
+			"bun": "./src/schemas/index.ts",
 			"default": "./dist/schemas/index.js"
 		},
 		"./declension": {
 			"types": "./src/declension/index.ts",
+			"bun": "./src/declension/index.ts",
 			"default": "./dist/declension/index.js"
 		}
 	},

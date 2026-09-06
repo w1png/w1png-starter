@@ -1,5 +1,12 @@
-node_modules
-.turbo
+**/node_modules
+**/.turbo
+**/dist
+**/.output
+**/test-results
+**/.env
+**/.env.*
+!**/.env.example
+.git
 out
-
 .DS_Store
+apps/server/server

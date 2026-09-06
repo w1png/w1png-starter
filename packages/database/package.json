@@ -15,23 +15,26 @@
 	"exports": {
 		".": {
 			"types": "./src/index.ts",
+			"bun": "./src/index.ts",
 			"default": "./dist/index.js"
 		},
 		"./schema": {
 			"types": "./src/schema/index.ts",
+			"bun": "./src/schema/index.ts",
 			"default": "./dist/schema/index.js"
 		}
 	},
 	"devDependencies": {
 		"@types/bun": "latest",
-		"drizzle-kit": "^0.31.2"
+		"drizzle-kit": "^0.31.2",
+		"dotenv": "^17.3.1"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
 	},
 	"dependencies": {
 		"drizzle-orm": "catalog:",
-		"@lunarweb/env": "workspace:*",
-		"@lunarweb/shared": "workspace:*"
+		"@lunarweb/shared": "workspace:*",
+		"postgres": "^3.4.9"
 	}
 }
